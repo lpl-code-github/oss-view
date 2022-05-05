@@ -49,7 +49,7 @@ export default {
     },
     // 跳转到文档链接
     toDoc() {
-      window.open("http://localhost:8080", '_blank')
+      window.open("https://lpl-code-github.github.io/", '_blank')
     }
   }
 };
