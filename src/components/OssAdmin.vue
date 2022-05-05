@@ -283,11 +283,11 @@ export default {
         // 判断sessionStorage中有没有hash对应的token
         var sessionToken = sessionStorage.getItem(hash);
         if (sessionToken === null) { // 如果sessionStorage中没有token
+          this.$message.info("文件大小超过50MB，将分片上传，请稍候")
           // 发送分片上传请求
           this.$request.getSliceUploadToken(param.file.name, hash, param.file.size).then(val => {
             if (val.status === 201) {  // 201表示token创建成功
               var token = val.headers.location // 保存token
-              this.$message.info("文件大小超过50MB，将分片上传")
               // 文件切片上传
               this.uploadSliceFlag = true // 显示分片二字
               this.progressShow = true // 显示进度条
