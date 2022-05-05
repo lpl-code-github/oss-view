@@ -10,12 +10,12 @@ module.exports = {
         host: 'lploss.cn',
         port: 9000,
         proxy: {
-            '/api': {
-                target: 'http://localhost:12345',// 要跨域的域名
+            '/apis': {
+                target: 'http://localhost:9000',// 要跨域的域名
                 secure:false,
                 changeOrigin: true, // 是否开启跨域
                 pathRewrite:{
-                    "^/api":""
+                    "^/apis":""
                 }
             }
         }
