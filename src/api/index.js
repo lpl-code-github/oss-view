@@ -18,7 +18,7 @@ axios.defaults.timeout = 100000
 
 // 代理接口
 const service = axios.create({
-	baseURL: '/api'
+	baseURL: '/apis'
 })
 
 // 请求拦截器(在请求之前进行一些配置)
