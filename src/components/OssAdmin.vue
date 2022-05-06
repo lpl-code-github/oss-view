@@ -37,9 +37,14 @@
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             </el-upload>
             <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
-              <span v-if="progressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span v-if="uploadSliceFlag">分片</span>上传进度：</span>
-              <el-progress v-if="progressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}" :text-inside="true" :stroke-width="15"
+              <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span v-if="uploadSliceFlag">分片</span>上传进度：</span>
+              <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}" :text-inside="true"
+                           :stroke-width="15"
                            :percentage="progressPercent"></el-progress>
+              <span v-if="hashProgressShow" style="width:20%">上传前准备工作：</span>
+              <el-progress v-if="hashProgressShow" style="width:80%" :text-inside="true"
+                           :stroke-width="15"
+                           :percentage="hashProgressPercent"></el-progress>
             </div>
           </div>
         </div>
@@ -247,15 +252,17 @@ export default {
     return {
       objName: "",// 某行操作按钮点击时获取的对象name
       content: "",// 搜索框
-      progressPercent: 0, // 进度条默认为0
-      progressShow: false, // 进度条默认不显示
-      uploadSliceFlag:false,// 分片 默认不显示
+      progressPercent: 0, // 上传进度条默认为0
+      uploadProgressShow: false, // 上传进度条默认不显示
+      hashProgressShow:false,// 计算hash进度条默认不显示
+      uploadSliceFlag: false,// 分片 默认不显示
       drawer: false, // 其它版本的抽屉 是否显示flag
       tableData: [], // 全部对相列表 表格数据
       othersVersion: [], // 单个对象全部版本 表格数据
-      bytesPerPiece: 5242880 // 约定每个切片的长度
-      // bytesPerPiece: 32000 // 约定每个切片的长度
-
+      bytesPerPiece: 5242880, // 约定每个切片的长度
+      // bytesPerPiece: 32000, // 约定每个切片的长度
+      hashProgressPercent: 0,//计算hash进度
+      notification: null,// 计算hash消息通知默认不关闭
     }
   },
   mounted() {
@@ -266,9 +273,29 @@ export default {
     // 上传对象
     async uploadRequest(param) {
       this.progressPercent = 0// 上传新文件时，将进度条值置为零
+
+      if (param.file.size > 104857600) { //大于100M显示hash计算进度和弹窗
+        this.hashProgressPercent = 0 // 进度条为0
+        this.hashProgressShow = true // 进度条显示
+        this.notification = this.$notify({
+          title: '提示',
+          dangerouslyUseHTMLString: true,
+          message: `文件有点大，计算hash过程可能比较长～`,
+          duration: 0,
+          showClose: false
+        });
+      }
+
       // 获取对象hash值的base64编码值
       let hash = "";
       hash = await this.getFileHash(param);
+      this.hashProgressShow = false
+
+      setTimeout(() => { // 成功获取hash值后
+        if (this.notification !== null) {
+          this.notification.close() // 关闭通知
+        }
+      }, 1000);
 
       // 进度条
       const uploadProgressEvent = progressEvent => {
@@ -277,7 +304,7 @@ export default {
 
       if (param.file.size <= 52428800) { // 50mb 以下 普通上传;以上 分片上传
         this.uploadSliceFlag = false // 不显示分片二字
-        this.progressShow = true // 显示进度条
+        this.uploadProgressShow = true // 显示进度条
         this.uploadObj(param, hash, uploadProgressEvent)// 普通上传
       } else {
         // 判断sessionStorage中有没有hash对应的token
@@ -290,16 +317,16 @@ export default {
               var token = val.headers.location // 保存token
               // 文件切片上传
               this.uploadSliceFlag = true // 显示分片二字
-              this.progressShow = true // 显示进度条
+              this.uploadProgressShow = true // 显示进度条
               this.uploadSlice(param, token, hash)
             } else if (val.status === 200) { // 200表示hash已存在，直接显示已上传，新增版本
               this.uploadSliceFlag = true // 显示分片二字
-              this.progressShow = true // 显示进度条
+              this.uploadProgressShow = true // 显示进度条
               this.progressPercent = 100 // 进度条拉到100
 
               setTimeout(() => {
                 this.progressPercent = 0 // 进度条归0
-                this.progressShow = false // 关闭进度条
+                this.uploadProgressShow = false // 关闭进度条
                 this.$message.success("上传成功")
                 this.getObjList(this.content, 1)
               }, 2000);
@@ -312,20 +339,38 @@ export default {
         }
       }
     },
-    // 获得文件的hash值，并base64编码
-    getFileHash(param) {
-      return new Promise(function (resolve, reject) {
-        let reader = new FileReader()
-        reader.readAsArrayBuffer(param.file)
-        reader.onload = () => {
-          var wordArray = CryptoJS.lib.WordArray.create(reader.result);
-          var hash = CryptoJS.SHA256(wordArray).toString()
-          // console.log("js计算sha256值：" + hash)
-          var hashValue = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
-          // console.log("散列值的base64编码" + hashValue)
-          resolve(hashValue);
-        }
-      })
+
+    // 分片读取文件 增量计算hash值，并base64编码
+    async getFileHash(param) {
+      let sha256 = CryptoJS.algo.SHA256.create();
+      const sliceSize = 10_485_760; // 10 MiB
+      let start = 0;
+
+      while (start < param.file.size) {
+        this.hashProgressPercent = Math.floor((100 / param.file.size) * start)
+        const slice = await this.readSlice(param.file, start, sliceSize);
+        const wordArray = CryptoJS.lib.WordArray.create(slice);
+        sha256 = sha256.update(wordArray);
+        start += sliceSize;
+      }
+
+      sha256.finalize();
+      var hash = sha256._hash.toString()
+      console.log("js计算sha256值：" + hash)
+      var hashValue = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
+      console.log("散列值的base64编码" + hashValue)
+      return hashValue;
+    },
+
+    async readSlice(file, start, size) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        const slice = file.slice(start, start + size);
+
+        fileReader.onload = () => resolve(new Uint8Array(fileReader.result));
+        fileReader.onerror = reject;
+        fileReader.readAsArrayBuffer(slice);
+      });
     },
 
     // 文件普通上传
@@ -340,7 +385,7 @@ export default {
         // 延时2秒刷新对象列表，并将对象进度条清0
         setTimeout(() => {
           this.progressPercent = 0 // 进度条归0
-          this.progressShow = false // 关闭进度条
+          this.uploadProgressShow = false // 关闭进度条
           this.getObjList(this.content, 1)
         }, 2000);
       })
@@ -378,7 +423,7 @@ export default {
                 sessionStorage.removeItem(hash)
               }
               this.progressPercent = 0 // 进度条归0
-              this.progressShow = false // 关闭进度条
+              this.uploadProgressShow = false // 关闭进度条
               this.getObjList(this.content, 1)
             }, 2000);
           } else { // 不是最后一个分片，递归调用uploadSlice方法
