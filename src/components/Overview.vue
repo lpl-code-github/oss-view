@@ -215,8 +215,8 @@ export default {
   },
   mounted() {
     this.getHeartbeat()
+    this.checks = setInterval(this.check, 0);// 防止定时任务时间问题，再多跑一次执行检查
     this.timer = setInterval(this.getHeartbeat, 5000); //5秒去执行一次定时任务
-    this.checks = setInterval(this.check, 1000);// 防止定时任务时间问题，再多跑一次执行检查
   },
   beforeDestroy() {// 实例销毁时清除定时任务
     if (this.timer) { //如果定时器还在运行
@@ -229,20 +229,21 @@ export default {
   methods: {
     // 获得心跳检测
     getHeartbeat() {
-      this.$request.getHeartbeat().then(val => {
-        this.splitData(val)// 组装数据
+      this.$request.getHeartbeat().then(async val => {
+        await this.splitData(val)// 组装数据
         this.check() // 检查是否有心跳失败节点
       })
     },
 
     // 组装echarts数据
-    splitData(val) {
+     splitData(val) {
       let i = 1;
       this.links = [];
       this.HeartbeatTableData = []
       this.HeartbeatEChartsData = [{
-        name: '接口服务',
-        value: "127.0.0.1",
+        symbol: 'image://https://pic.imgdb.cn/item/6276198809475431298d85b6.png',
+        name: "",
+        value: "接口服务",
         x: 300,
         y: 0,
         colors: '#009991'
@@ -257,8 +258,7 @@ export default {
         tableData["date"] = val[key]
         tableData["state"] = "正常"
 
-        this.HeartbeatTableData.push(tableData)
-
+        EChartsData["symbol"] = 'image://https://pic.imgdb.cn/item/6276134a094754312978eea7.png'
         EChartsData["name"] = "node" + i
         EChartsData["value"] = key
         if (i % 2 === 0) {
@@ -270,14 +270,22 @@ export default {
         }
         EChartsData["colors"] = "#5470c6"
 
-        if (this.tableIndexFaultColor.indexOf(i - 1) !== -1) {
-          console.log(i + 2)
-          EChartsData["colors"] = "#F72C5B"
-        }
-        this.HeartbeatEChartsData.push(EChartsData)
 
-        nodeLink["source"] = "接口服务"
+        nodeLink["source"] = ""
         nodeLink["target"] = "node" + i
+        nodeLink["lineStyle"] = {}
+
+
+        if (this.tableIndexFaultColor.indexOf(i - 1) !== -1) { //宕机
+          EChartsData["colors"] = "#F72C5B"
+          nodeLink["lineStyle"] = {
+            color: "#F72C5B",
+            type: 'dotted'
+          }
+        }
+
+        this.HeartbeatTableData.push(tableData)
+        this.HeartbeatEChartsData.push(EChartsData)
         this.links.push(nodeLink)
         this.HeartbeatEChartsData[0].y = (i * 100) / 2 + 100
         i++
@@ -329,7 +337,7 @@ export default {
       this.myChart.setOption({
         //animation:false,// 取消动画
         title: {
-          text: '接口服务节点(Refresh every 5 seconds)'
+          text: '数据服务节点(Refresh every 5 seconds)'
         },
         tooltip: {},
         animationDurationUpdate: 1500,
@@ -350,6 +358,7 @@ export default {
             },
             data: this.HeartbeatEChartsData.map((item) => {
               return {
+                symbol: item.symbol,
                 name: item.name,
                 value: item.value,
                 colors: item.colors,
@@ -360,7 +369,8 @@ export default {
             links: this.links.map((item) => {
               return {
                 source: item.source,
-                target: item.target
+                target: item.target,
+                lineStyle: item.lineStyle
               }
             }),
             lineStyle: {
