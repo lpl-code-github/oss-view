@@ -14,7 +14,7 @@
           {{ systemInfo.Obj }}
         </font></font></div>
         <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          存储对象数量
+          存储对象数量/个
         </font></font></div>
       </div>
       <div class="blue statistic">
@@ -23,7 +23,7 @@
           <font style="vertical-align: inherit;">
             {{ systemInfo.Put }}</font></font></div>
         <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          上传请求次数
+          上传请求次数/次
         </font></font></div>
       </div>
       <div class="orange statistic">
@@ -32,7 +32,7 @@
             style="vertical-align: inherit;">{{ systemInfo.Uphold }}
         </font></font></div>
         <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          维护次数
+          维护次数/次
         </font></font></div>
       </div>
     </div>
@@ -329,13 +329,17 @@ export default {
       }, 2000);
     },
 
-    // 获取系统维护列表
+    // 获取系统维护信息
     getSystemInfo(index) {
       this.$request.systemInfo(index).then(async val => {
         if (val.status === 200) {
           // console.log(val.data.Operation)
           this.operationData = val.data.Operation.OperationData
           this.operationSize = val.data.Operation.OperationSize
+
+          val.data.Put = this.numberFormat(val.data.Put)
+          val.data.Obj = this.numberFormat(val.data.Obj)
+          val.data.Uphold = this.numberFormat(val.data.Uphold)
           this.systemInfo = val.data
           var body = this.systemInfo.Echarts
           Object.keys(body).forEach((key, index) => {
@@ -404,7 +408,7 @@ export default {
       })
 
       // 让图表跟随屏幕自动的去适应
-      window.addEventListener('resize',  ()=> {
+      window.addEventListener('resize', () => {
         this.myChart.resize()
       })
     },
@@ -413,10 +417,25 @@ export default {
     handleCurrentChange(val) {    //分页的点击函数current-change，在currentPage 改变时会触发
       this.getSystemInfo(val - 1)
     },
+
+    // 大数值的转换
+    numberFormat(value) {
+      var param ='';
+      var k = 10000,
+          sizes = ['', '万', '亿', '万亿'],
+          i;
+      if (value < k) {
+        return value
+      } else {
+        i = Math.floor(Math.log(value) / Math.log(k));
+        param  += ((value / Math.pow(k, i))).toFixed(2);
+        param  += sizes[i];
+      }
+      return param;
+    }
   }
 }
 </script>
 
 <style>
-
 </style>
