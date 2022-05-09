@@ -4,12 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>LPL对象存储</title>
 	<style>
 	    #loader-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; }
 	    #loader {
-	      display: block; position: relative; left: 50%; top: 40%; z-index: 1001; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 3px solid transparent;border-top-color: #fe9501;         
+	      display: block; position: relative; left: 50%; top: 40%; z-index: 1001; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 3px solid transparent;border-top-color: #fe9501;
 	      -webkit-animation: spin 2s linear infinite;
 	      -ms-animation: spin 2s linear infinite;
 	      -moz-animation: spin 2s linear infinite;
@@ -41,8 +40,9 @@
 	      100% { -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); transform: rotate(360deg); }
 	    }
 	   </style>
-	
   </head>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js'></script>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
