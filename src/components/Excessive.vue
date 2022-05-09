@@ -1,166 +1,38 @@
-<!--此组件为echarts过渡动画，用于首页跳转控制台-->
 <template>
-  <div style="width: 100%;height: 100%;margin: auto">
-    <div class="excessive" id="tex" :style="styles"></div>
-    <div class="excessive" id="loading" style="height: 100%"></div>
+  <div class="container">
+    <div class="box">
+      <div class="title">
+        <span class="block"></span>
+        <h1>即将跳转到控制台<span></span></h1>
+      </div>
+
+      <div class="role">
+        <div class="block"></div>
+        <p>To Console</p>
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script>
 export default {
-  name: 'Excessive',
-  data() {
-    return {
-      styles: {
-        width: '100%',
-        height: "250px"
-      },
-      myChart1: null,
-      myChart2: null,
-      timer1: null,
-      timer2: null
+  name: "Excessive",
+  data(){
+    return{
+      timer: null
     }
   },
   mounted() {
-    this.echarts2()// 先执行一次加载loading
-    this.timer1 = setInterval(this.echarts1, 2000);//两秒后关闭loading，执行文字动画
-    this.timer2 = setInterval(this.push, 5000);// 文字动画为3秒，连同加载loading共5秒后跳转到控制台
+    this.timer = setInterval(this.push, 5000);// 文字动画为2秒
   },
   beforeDestroy() {// 实例销毁之前调用
-    if (this.timer1) { //如果定时器还在运行 直接关闭
-      clearInterval(this.timer1); //关闭
-    }
-    if (this.timer2) { //如果定时器还在运行 直接关闭
-      clearInterval(this.timer2); //关闭
+
+    if (this.timer) { //如果定时器还在运行 直接关闭
+      clearInterval(this.timer); //关闭
     }
   },
-  methods: {
-    // loading动画
-    echarts2() {
-      // 如果myChart2存在就先关闭
-      if (this.myChart2 != null && this.myChart2 != "" && this.myChart2 != undefined) {
-        this.myChart2.dispose();
-      }
-      // 渲染myChart2
-      this.myChart2 = this.$echarts.init(document.getElementById('loading'))
-
-      this.myChart2.setOption({
-        graphic: {
-          elements: [
-            {
-              type: 'group',
-              left: 'center',
-              top: 'center',
-              children: new Array(7).fill(0).map((val, i) => ({
-                type: 'rect',
-                x: i * 20,
-                shape: {
-                  x: 0,
-                  y: -40,
-                  width: 10,
-                  height: 80
-                },
-                style: {
-                  fill: '#5470c6'
-                },
-                keyframeAnimation: {
-                  duration: 1000,
-                  delay: i * 200,
-                  loop: true,
-                  keyframes: [
-                    {
-                      percent: 0.5,
-                      scaleY: 0.3,
-                      easing: 'cubicIn'
-                    },
-                    {
-                      percent: 1,
-                      scaleY: 1,
-                      easing: 'cubicOut'
-                    }
-                  ]
-                }
-              }))
-            }
-          ]
-        }
-      })
-
-      // 让图表跟随屏幕自动的去适应
-      window.addEventListener('resize',  ()=> {
-        this.myChart2.resize()
-      })
-    },
-
-    // 文字动画
-    echarts1() {
-      if (this.timer1) { //如果定时器还在运行
-        clearInterval(this.timer1); //关闭
-      }
-      // 关闭myChart2
-      this.myChart2.dispose();
-      // 如果myChart1存在则关闭
-      if (this.myChart1 != null && this.myChart1 != "" && this.myChart1 != undefined) {
-        this.myChart1.dispose();
-      }
-      // 渲染myChart1
-      this.myChart1 = this.$echarts.init(document.getElementById('tex'))
-
-      this.myChart1.setOption({
-        graphic: {
-          elements: [
-            {
-              type: 'text',
-              left: 'center',
-              top: 'center',
-              style: {
-                text: 'Simple Distributed Object Storage',
-                fontSize: 80,
-                fontWeight: 'bold',
-                lineDash: [0, 200],
-                lineDashOffset: 0,
-                fill: 'transparent',
-                stroke: '#000',
-                lineWidth: 1
-              },
-              keyframeAnimation: {
-                duration: 3000,
-                loop: true,
-                keyframes: [
-                  {
-                    percent: 0.7,
-                    style: {
-                      fill: 'transparent',
-                      lineDashOffset: 200,
-                      lineDash: [200, 0]
-                    }
-                  },
-                  {
-                    // Stop for a while.
-                    percent: 0.8,
-                    style: {
-                      fill: 'transparent'
-                    }
-                  },
-                  {
-                    percent: 1,
-                    style: {
-                      fill: '#5470c6',
-                      stroke: '#5470c6',
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      })
-
-      // 让图表跟随屏幕自动的去适应
-      window.addEventListener('resize',  ()=> {
-        this.myChart1.resize()
-      })
-    },
+  methods:{
     // 跳转控制台
     push() {
       this.$router.push("/console")
@@ -169,16 +41,268 @@ export default {
 }
 </script>
 
-<style>
-.excessive {
-  width: 100px;
-  position: fixed;
-  top: 0;
+<style scoped lang="less">
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  height: 100vh;
+  background: #232323;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .box {
+    width: 300px;
+    height: 280px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+
+    .title {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 50px;
+
+      .block {
+        width: 0%;
+        height: inherit;
+        background: #ffb510;
+        position: absolute;
+        animation: mainBlock 2s cubic-bezier(.74, .06, .4, .92) forwards;
+        display: flex;
+      }
+
+      h1 {
+        font-family: 'Poppins';
+        color: #fff;
+        font-size: 32px;
+        -webkit-animation: mainFadeIn 2s forwards;
+        -o-animation: mainFadeIn 2s forwards;
+        animation: mainFadeIn 2s forwards;
+        animation-delay: 1.6s;
+        opacity: 0;
+        display: flex;
+        align-items: baseline;
+        position: relative;
+
+        span {
+          width:0px;
+          height: 0px;
+          -webkit-border-radius: 50%;
+          -moz-border-radius: 50%;
+          border-radius: 50%;
+
+          background: #ffb510;
+          -webkit-animation: load 0.6s cubic-bezier(.74, .06, .4, .92) forwards;
+          animation: popIn 0.8s cubic-bezier(.74, .06, .4, .92) forwards;
+          animation-delay: 2s;
+          margin-left: 5px;
+          margin-top: -10px;
+          position: absolute;
+          bottom: 13px;
+          right: -12px;
+
+        }
+      }
+    }
+
+    .role {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 30px;
+      margin-top: -10px;
+
+      .block {
+        width: 0%;
+        height: inherit;
+        background: #e91e63;
+        position: absolute;
+        animation: secBlock 2s cubic-bezier(.74, .06, .4, .92) forwards;
+        animation-delay: 2s;
+        display: flex;
+      }
+
+      p {
+        animation: secFadeIn 2s forwards;
+        animation-delay: 3.2s;
+        opacity: 0;
+        font-weight: 400;
+        font-family: 'Lato';
+        color: #ffffff;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+      }
+    }
+  }
+}
+
+
+
+
+
+@keyframes mainBlock {
+  0% {
+    width: 0%;
+    left: 0;
+
+  }
+  50% {
+    width: 100%;
+    left: 0;
+
+  }
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+@keyframes secBlock {
+  0% {
+    width: 0%;
+    left: 0;
+
+  }
+  50% {
+    width: 100%;
+    left: 0;
+
+  }
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+@keyframes mainFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@keyframes popIn {
+  0% {
+    width: 0px;
+    height: 0px;
+    background: #e9d856;
+    border: 0px solid #ddd;
+    opacity: 0;
+  }
+  50% {
+    width: 10px;
+    height: 10px;
+    background: #e9d856;
+    opacity: 1;
+    bottom: 45px;
+  }
+  65% {
+    width: 7px;
+    height: 7px;
+    bottom: 0px;
+    width: 15px
+  }
+  80% {
+    width: 10px;
+    height: 10px;
+    bottom: 20px
+  }
+  100% {
+    width: 7px;
+    height: 7px;
+    background: #e9d856;
+    border: 0px solid #222;
+    bottom: 13px;
+
+  }
+}
+
+@keyframes secFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+
+
+
+footer {
+  width: 350px;
+  height: 80px;
+  background: #ffb510;
+  position: absolute;
   right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
+  bottom: -80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: top 0.8s forwards;
+  animation-delay: 4s;
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #232323;
+    font-family: 'Poppins';
+
+    i {
+      margin-right: 25px;
+      font-size: 22px;
+      color: #232323;
+      animation: icon 2s forwards;
+      animation-delay: 4s;
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes top {
+  0% {
+    opacity: 0;
+    bottom: -80px
+  }
+  100% {
+    opacity: 1;
+    bottom: 0px
+
+  }
+}
+
+@keyframes icon {
+  0% {
+    opacity: 0;
+    transform: scale(0.0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3) rotate(-02deg);
+  }
+  100% {
+    opacity: 1;
+    bottom: 0px;
+  }
 }
 </style>
-
-
