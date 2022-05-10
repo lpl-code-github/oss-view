@@ -44,7 +44,6 @@ export default {
 
   .el-container.is-vertical {
     height: 100%;
-
   }
 
   .el-header {
