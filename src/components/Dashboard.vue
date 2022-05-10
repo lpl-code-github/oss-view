@@ -255,8 +255,9 @@ export default {
 </script>
 <style scoped>
 .myText {
-  background-image: linear-gradient(135deg, red, blue);
+  /*background-image: linear-gradient(135deg, red, blue);*/
+  color: white;
   -webkit-background-clip: text;
-  color: transparent;
+  /*color: transparent;*/
 }
 </style>
