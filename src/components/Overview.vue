@@ -1,153 +1,172 @@
 <!--心跳检测及节点信息-->
 <template>
-  <div>
+  <div class="overview">
     <!-- 心跳检测echarts节点图 -->
     <div id="main" :style="styles"></div>
-    <!-- 心跳检测列表数据 -->
+
     <div>
-      <el-table
-          :data="HeartbeatTableData"
-          style="width: 100%"
-          :row-class-name="tableRowClassName">
-        <el-table-column
-            prop="name"
-            label="节点"
-            width="180">
-        </el-table-column>
-        <el-table-column
-            prop="value"
-            label="IP"
-            width="180">
-        </el-table-column>
-        <el-table-column
-            :formatter="dateFormat"
-            prop="date"
-            label="实时心跳检测时间">
-        </el-table-column>
-        <el-table-column
-            prop="state"
-            label="状态">
-        </el-table-column>
-        <el-table-column
-            fixed="right"
-            label="操作"
-            width="200">
-          <temdplate slot-scope="scope">
-            <el-button v-if="scope.row.state !=='故障'" @click="handleClick(scope.row)" type="text" size="small">
-              查看节点系统信息
-            </el-button>
-            <el-button v-if="scope.row.state ==='故障'" disabled type="text" size="small">查看节点系统信息</el-button>
-          </temdplate>
-        </el-table-column>
-      </el-table>
+      <!-- 心跳检测列表数据 -->
+      <table class="ui five column selectable inverted table" style="margin-top: 10px">
+        <thead>
+        <tr>
+          <th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">节点</font></font></th>
+          <th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">IP</font></font></th>
+          <th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">实时心跳检测时间</font></font></th>
+          <th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">状态</font></font></th>
+          <th><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">节点系统信息</font></font></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-if=" HeartbeatTableData.length === 0">
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            暂无数据
+          </font></font>
+          </td>
+        </tr>
+        <tr v-for="(item,index) in HeartbeatTableData" :key="index">
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            {{item.name }}</font></font>
+          </td>
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            {{item.value }}</font></font>
+          </td>
+          <td><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">{{ item.date |dateFilter("yyy-mm-dd hh:mm:ss") }}</font></font>
+          </td>
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit; ">
+            <i v-if="item.state ==='故障'" class="red attention icon"></i>
+            <i v-if="item.state ==='正常'" class="green check icon"></i>
+            {{ item.state }}</font></font>
+          </td>
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            <button v-if="item.state ==='正常'" class="ui inverted black basic button"
+                    @click="handleClick(item.value,$event)"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">查看</font></font></button>
+            <button v-if="item.state ==='故障'" class="ui inverted disabled black basic button"><font
+                style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看</font></font></button>
+          </font></font></td>
+        </tr>
 
-      <el-dialog :title="title" :visible.sync="dialogTableVisible" width="100%" @close='closeDialog'>
-        <div class="ui four statistics">
-          <!--系统信息-->
-          <div class="statistic">
-            <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              系统信息</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-            </font></font></div>
-            <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
-                内核版本: {{ systemStatus.systemInfo.kernelVersion }} <br>
-                平台信息: {{ systemStatus.systemInfo.platform }} <br>
-                OS Family: {{ systemStatus.systemInfo.osFamily }}<br>
-                os版本: {{ systemStatus.systemInfo.osVersion }}<br>
-              </div>
-            </font></font></div>
+        </tbody>
+      </table>
+    </div>
 
-          </div>
+    <el-dialog :visible.sync="dialogTableVisible" width="90%" @close='closeDialog'>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
 
-          <!--CPU信息-->
-          <div class="statistic">
-            <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              CPU</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-            </font></font></div>
-            <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
-                物理核数: {{ systemStatus.cpu.physicalCnt }} <br>
-                逻辑核数: {{ systemStatus.cpu.logicalCnt }} <br>
-              </div>
-            </font></font></div>
 
-            <div class="progressBox">
-              <Dashboard
-                  type="dashboard"
-                  :width="dashboardData.width"
-                  :rate="dashboardData.rate"
-                  :percentage="systemStatus.cpu.cpuTotalPercent"
-                  :bgColor="dashboardData.bgColor"
-                  :color="dashboardData.colors"
-                  :stroke-width="dashboardData.strokeWidth"
-                  :stroke-linecap="dashboardData.strokeLinecap"
-              />
-              <div class="labelBox">负载</div>
+      <h2 style="margin-top: -30px;margin-bottom: 20px;text-align: center">{{ title }}</h2>
+
+      <div class="ui four statistics">
+        <!--系统信息-->
+        <div class="statistic">
+          <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            系统信息</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
+              内核版本: {{ systemStatus.systemInfo.kernelVersion }} <br>
+              平台信息: {{ systemStatus.systemInfo.platform }} <br>
+              OS Family: {{ systemStatus.systemInfo.osFamily }}<br>
+              os版本: {{ systemStatus.systemInfo.osVersion }}<br>
             </div>
-          </div>
+          </font></font></div>
 
-          <!--内存信息-->
-          <div class="statistic">
-            <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              内存</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-            </font></font></div>
-            <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
-                总大小: {{ systemStatus.mem.total }} <br>
-                可用大小: {{ systemStatus.mem.available }} <br>
-              </div>
-            </font></font></div>
-            <div class="progressBox">
-              <Dashboard
-                  type="dashboard"
-                  :width="dashboardData.width"
-                  :rate="dashboardData.rate"
-                  :percentage="systemStatus.mem.memTotalPercent"
-                  :bgColor="dashboardData.bgColor"
-                  :color="dashboardData.colors"
-                  :stroke-width="dashboardData.strokeWidth"
-                  :stroke-linecap="dashboardData.strokeLinecap"
-              />
-              <div class="labelBox">使用率</div>
-            </div>
-          </div>
+        </div>
 
-          <!--硬盘信息-->
-          <div class="statistic">
-            <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              硬盘分区 {{ systemStatus.disk.path }} </font></font><br><font style="vertical-align: inherit;"><font
-                style="vertical-align: inherit;">
-            </font></font></div>
-            <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-              <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
-                分区总容量: {{ systemStatus.disk.total }} <br>
-                空闲容量: {{ systemStatus.disk.free }} <br>
-              </div>
-            </font></font></div>
-            <div class="progressBox">
-              <Dashboard
-                  type="dashboard"
-                  :width="dashboardData.width"
-                  :rate="dashboardData.rate"
-                  :percentage="systemStatus.disk.usedPercent"
-                  :bgColor="dashboardData.bgColor"
-                  :color="dashboardData.colors"
-                  :stroke-width="dashboardData.strokeWidth"
-                  :stroke-linecap="dashboardData.strokeLinecap"
-              />
-              <div class="labelBox">使用率</div>
+
+        <!--CPU信息-->
+        <div class="statistic">
+          <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            CPU</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
+              物理核数: {{ systemStatus.cpu.physicalCnt }} <br>
+              逻辑核数: {{ systemStatus.cpu.logicalCnt }} <br>
             </div>
-            <span></span>
+          </font></font></div>
+
+          <div class="progressBox">
+            <Dashboard
+                type="dashboard"
+                :width="dashboardData.width"
+                :rate="dashboardData.rate"
+                :percentage="systemStatus.cpu.cpuTotalPercent"
+                :bgColor="dashboardData.bgColor"
+                :color="dashboardData.colors"
+                :stroke-width="dashboardData.strokeWidth"
+                :stroke-linecap="dashboardData.strokeLinecap"
+            />
+            <div class="labelBox">负载</div>
           </div>
         </div>
-      </el-dialog>
 
-    </div>
+        <!--内存信息-->
+        <div class="statistic">
+          <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            内存</font></font><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
+              总大小: {{ systemStatus.mem.total }} <br>
+              可用大小: {{ systemStatus.mem.available }} <br>
+            </div>
+          </font></font></div>
+          <div class="progressBox">
+            <Dashboard
+                type="dashboard"
+                :width="dashboardData.width"
+                :rate="dashboardData.rate"
+                :percentage="systemStatus.mem.memTotalPercent"
+                :bgColor="dashboardData.bgColor"
+                :color="dashboardData.colors"
+                :stroke-width="dashboardData.strokeWidth"
+                :stroke-linecap="dashboardData.strokeLinecap"
+            />
+            <div class="labelBox">使用率</div>
+          </div>
+        </div>
+
+        <!--硬盘信息-->
+        <div class="statistic">
+          <div class="text value"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            硬盘分区 {{ systemStatus.disk.path }} </font></font><br><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            <div style="text-align: left;display: flex;justify-content: center;align-items: center;">
+              分区总容量: {{ systemStatus.disk.total }} <br>
+              空闲容量: {{ systemStatus.disk.free }} <br>
+            </div>
+          </font></font></div>
+          <div class="progressBox">
+            <Dashboard
+                type="dashboard"
+                :width="dashboardData.width"
+                :rate="dashboardData.rate"
+                :percentage="systemStatus.disk.usedPercent"
+                :bgColor="dashboardData.bgColor"
+                :color="dashboardData.colors"
+                :stroke-width="dashboardData.strokeWidth"
+                :stroke-linecap="dashboardData.strokeLinecap"
+            />
+            <div class="labelBox">使用率</div>
+          </div>
+          <span></span>
+        </div>
+      </div>
+
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Dashboard from "@/components/Dashboard";
+import $ from "jquery"
 
 export default {
   name: 'Overview',
@@ -203,11 +222,10 @@ export default {
         percentage: 90,
         bgColor: "#cfcfcf",
         colors: [
-          {color: "#5090FF", percentage: 20},
-          {color: "#5090FF", percentage: 40},
-          {color: "#5090FF", percentage: 60},
-          {color: "#5090FF", percentage: 80},
-          {color: "#5090FF", percentage: 100},
+          {color: "#30b313", percentage: 25},
+          {color: "#c9af09", percentage: 50},
+          {color: "#d57f08", percentage: 75},
+          {color: "#b90101", percentage: 100},
         ],
       },
       getNodeSystemInfoTimer: null,// 获取系统节点信息的定时器
@@ -236,7 +254,7 @@ export default {
     },
 
     // 组装echarts数据
-     splitData(val) {
+    splitData(val) {
       let i = 1;
       this.links = [];
       this.HeartbeatTableData = []
@@ -270,11 +288,9 @@ export default {
         }
         EChartsData["colors"] = "#5470c6"
 
-
         nodeLink["source"] = ""
         nodeLink["target"] = "node" + i
         nodeLink["lineStyle"] = {}
-
 
         if (this.tableIndexFaultColor.indexOf(i - 1) !== -1) { //宕机
           EChartsData["colors"] = "#F72C5B"
@@ -315,17 +331,6 @@ export default {
       })
     },
 
-    // 心跳检测列表颜色状态的改变
-    tableRowClassName({row, rowIndex}) {
-      // 如果故障节点数组tableIndexFaultColor中存在行索引
-      if (this.tableIndexFaultColor.indexOf(rowIndex) !== -1) {
-        // 将该行列表设置为红色
-        return 'warning-row';
-      }
-      // 正常节点为绿色
-      return 'success-row';
-    },
-
     // echarts节点图
     echarts() {
       if (this.myChart != null && this.myChart !== "" && this.myChart !== undefined) {
@@ -337,7 +342,10 @@ export default {
       this.myChart.setOption({
         //animation:false,// 取消动画
         title: {
-          text: '数据服务节点(Refresh every 5 seconds)'
+          text: '数据服务节点(Refresh every 5 seconds)',
+          textStyle: {
+            color: '#a19e9e'
+          }
         },
         tooltip: {},
         animationDurationUpdate: 1500,
@@ -395,37 +403,27 @@ export default {
       })
     },
 
-    // 表格日期格式化
-    dateFormat(row, column, cellValue, index) {
-      const daterc = row[column.property]
-      if (daterc != null) {
-        var date = new Date(daterc);
-        var year = date.getFullYear();
-        /* 在日期格式中，月份是从0开始，11结束，因此要加0
-         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
-         * */
-        var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
-        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-        var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-        var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-        var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-        // 拼接
-        return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
-      }
-    },
-
     // 获取节点信息按钮事件
-    handleClick(row) {
-      this.title = row.value + " 节点系统信息"
-      this.getNodeSystemStatus(row) // 先执行一次
+    async handleClick(row, event) {
+      this.title = row + " 节点系统信息"
+      event.currentTarget.className = 'ui inverted black loading basic button' // 增加按钮loading
+      var nodeSystemStatus = await this.getNodeSystemStatus(row); // 先执行一次
+      $("button").removeClass("loading") //关闭按钮loading
+      if (nodeSystemStatus === false) {
+        return
+      }
       this.getNodeSystemInfoTimer = setInterval(() => {
-        this.getNodeSystemStatus(row)
+        if (this.getNodeSystemStatus(row) === false) {
+          clearInterval(this.getNodeSystemInfoTimer); //关闭
+        }
       }, 5000); //5秒去执行一次定时任务
+
     },
 
     // 获取节点系统信息的数据
-    getNodeSystemStatus(row) {
-      this.$request.getNodeSystemInfo(row.value).then(val => {
+    async getNodeSystemStatus(row) {
+      var flag = false
+      await this.$request.getNodeSystemInfo(row).then(val => {
         if (val.status === 200) {
           // 重新组装数据
           var info = val.data
@@ -438,16 +436,20 @@ export default {
 
           this.systemStatus = info
           this.dialogTableVisible = true
+          flag = true
         } else {
           this.dialogTableVisible = false
           this.$message.error("获取节点系统信息失败")
+          flag = false
         }
       })
+      return flag
     },
 
     //关闭弹框的事件
     closeDialog() {
       this.dialogTableVisible = false
+      $("button").removeClass("loading") //关闭按钮loading
       if (this.getNodeSystemInfoTimer) { //如果定时器还在运行
         clearInterval(this.getNodeSystemInfoTimer); //关闭
       }
@@ -474,11 +476,29 @@ export default {
       }
       return sizestr;
     }
+  },
+  // 日期格式化
+  filters: {
+    dateFilter: function (value) {
+      var date = new Date(value);
+      var year = date.getFullYear();
+      /* 在日期格式中，月份是从0开始，11结束，因此要加0
+       * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+       * */
+      var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+      var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+      var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+      var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+      // 拼接
+      return year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+    }
   }
 }
 </script>
 
-<style>
+<style lang='less'>
+
 .el-table .warning-row {
   background: oldlace;
 }
@@ -487,27 +507,137 @@ export default {
   background: #f0f9eb;
 }
 
-::v-deep .myText {
-  font-weight: bolder;
-  font-size: 20px !important;
-  background-image: linear-gradient(0deg, #498dff, #8bb7fe);
-}
+.overview {
+  width: 100%;
+  height: 100%;
+  //position: relative;
 
-.progressBox {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .el-dialog {
+    text-align: left;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    //width: 80%;
+    height: auto;
+    background: #111845a6;
+    box-sizing: border-box;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgb(23, 32, 90);
+    border: 2px solid #2a3cad;
+    color: white;
+    //padding: 20px;
 
-.labelBox {
-  background: #4c8fff;
-  width: 50px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  color: white;
-  border-radius: 15px;
-  margin-top: -20px;
+  }
+
+  .text {
+    color: #b0adad !important;
+  }
+
+  .label {
+    color: #d8cccc !important;
+  }
+
+  .el-dialog__headerbtn {
+    z-index: 99;
+  }
+
+  .el-dialog span:nth-child(1) {
+    transform: rotate(0deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-dialog span:nth-child(2) {
+    transform: rotate(90deg);
+    position: absolute;
+    top: 0;
+    left: 36.56%;
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-dialog span:nth-child(3) {
+    transform: rotate(180deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-dialog span:nth-child(4) {
+    transform: rotate(270deg);
+    position: absolute;
+    top: 0;
+    right: 36.55%;
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-dialog span:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #50dfdb;
+
+  }
+
+  .el-dialog span:nth-child(1):before, span:nth-child(3):before {
+    animation: animate 5s linear infinite;
+  }
+
+  .el-dialog span:nth-child(2):before, span:nth-child(4):before {
+    animation: animate 5s linear infinite;
+  }
+
+
+  @keyframes animate {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    50% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    50.1% {
+      transform: scaleX(1);
+      transform-origin: right;
+    }
+
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
+  }
+
+  ::v-deep .myText {
+    font-weight: bolder;
+    font-size: 20px !important;
+    background-image: linear-gradient(0deg, #498dff, #8bb7fe);
+  }
+
+  .progressBox {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .labelBox {
+    background: #4c8fff;
+    width: 50px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    color: white;
+    border-radius: 15px;
+    margin-top: -20px;
+  }
 }
 </style>
