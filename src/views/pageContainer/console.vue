@@ -66,9 +66,7 @@ export default {
     System
   },
   data() {
-    return {
-      // activeIndex: this.$route.path,
-    }
+    return {}
   },
   computed: {},
   watch: {},
@@ -139,10 +137,6 @@ export default {
   }
 
   .el-header {
-    //background-color: #1b1c1d;
-    //background-color: white;
-    //padding: 0px;
-    //height: 50px !important;
     headers {
       background-color: #181a1b;
       border-radius: 90px;
@@ -235,18 +229,13 @@ export default {
   }
 
   .el-footer {
-    //background-color: #1b1c1d;
     color: gray;
-    //background-color: white;
     text-align: center;
     line-height: 50px;
-    //height: 80px !important;
-    //padding-top: 20px;
   }
 
   .el-main {
     margin-top: 10px;
-    //background-color: white;
     color: #333;
     text-align: center;
     padding: 0;
@@ -279,10 +268,12 @@ export default {
     font-size: inherit;
     font-family: inherit;
   }
+
   button.learn-more {
     width: 10rem;
     height: auto;
   }
+
   button.learn-more .circle {
     transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
     position: relative;
@@ -293,6 +284,7 @@ export default {
     background: #282936;
     border-radius: 1.625rem;
   }
+
   button.learn-more .circle .icon {
     transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
     position: absolute;
@@ -301,6 +293,7 @@ export default {
     margin: auto;
     background: #fff;
   }
+
   button.learn-more .circle .icon.arrow {
     transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
     left: 0.625rem;
@@ -308,6 +301,7 @@ export default {
     height: 0.125rem;
     background: none;
   }
+
   button.learn-more .circle .icon.arrow::before {
     position: absolute;
     content: "";
@@ -319,6 +313,7 @@ export default {
     border-right: 0.125rem solid #fff;
     transform: rotate(45deg);
   }
+
   button.learn-more .button-text {
     transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
     position: absolute;
@@ -334,13 +329,16 @@ export default {
     text-align: center;
     text-transform: uppercase;
   }
+
   button:hover .circle {
     width: 100%;
   }
+
   button:hover .circle .icon.arrow {
     background: #fff;
     transform: translate(1rem, 0);
   }
+
   button:hover .button-text {
     color: #fff;
   }
