@@ -1,22 +1,38 @@
 <!--对象管理-->
 <template>
+
   <div class="ossadmin">
+
     <!-- 查找 and 上传-->
-    <div class="ui placeholder segment">
+    <div class="ui  placeholder segment" style="background-color: transparent">
       <div class="ui two column stackable center aligned grid">
-        <div class="ui vertical divider">Or</div>
+        <div class="ui inverted vertical divider">Or</div>
         <div class="middle aligned row">
           <div class="column">
-            <div class="ui icon header">
+            <div class="ui inverted icon header">
               <i class="search icon"></i>
-              Search Object
+              <div class="wrapper-header">
+                <span>S</span>
+                <span>e</span>
+                <span>a</span>
+                <span>r</span>
+                <span>c</span>
+                <span>h</span>
+                &nbsp;
+                <span>O</span>
+                <span>b</span>
+                <span>j</span>
+                <span>e</span>
+                <span>c</span>
+                <span>t</span>
+              </div>
             </div>
             <div class="field">
               <div class="ui search">
                 <div class="ui icon input">
                   <!--搜索输入框-->
                   <input v-model.trim="content" @input="getObjList(content,1)" class="prompt" type="text"
-                         placeholder="Object Name">
+                         placeholder="Input Object Name">
                   <i class="search icon"></i>
                 </div>
                 <div class="results"></div>
@@ -24,21 +40,38 @@
             </div>
           </div>
           <div class="column">
+            <div class="gradient">
+              <!--              <div class="gradient-border">css<br/>is<br/>awesome</div>-->
+              <el-upload
+                  weight="100%"
+                  ref="upload"
+                  action=""
+                  class="upload-demo"
+                  drag
+                  :http-request="uploadRequest"
+                  multiple>
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text" style="color: #d8cccc">拖拽或<em>点击上传</em></div>
+              </el-upload>
+            </div>
+
             <!--上传组件-->
-            <el-upload
-                weight="100%"
-                ref="upload"
-                action=""
-                class="upload-demo"
-                drag
-                :http-request="uploadRequest"
-                multiple>
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            </el-upload>
+            <!--            <el-upload-->
+            <!--                weight="100%"-->
+            <!--                ref="upload"-->
+            <!--                action=""-->
+            <!--                class="upload-demo"-->
+            <!--                drag-->
+            <!--                :http-request="uploadRequest"-->
+            <!--                multiple>-->
+            <!--              <i class="el-icon-upload"></i>-->
+            <!--              <div class="el-upload__text">拖拽或<em>点击上传</em></div>-->
+            <!--            </el-upload>-->
             <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
-              <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span v-if="uploadSliceFlag">分片</span>上传进度：</span>
-              <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}" :text-inside="true"
+              <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span
+                  v-if="uploadSliceFlag">分片</span>上传进度：</span>
+              <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}"
+                           :text-inside="true"
                            :stroke-width="15"
                            :percentage="progressPercent"></el-progress>
               <span v-if="hashProgressShow" style="width:20%">上传前准备工作：</span>
@@ -52,107 +85,129 @@
     </div>
 
     <!--  对象信息列表  -->
-    <div>
-      <el-table
-          :data="tableData.Data"
-          style="width: 100%">
-        <el-table-column label="对象名称" width="150">
-          <template slot-scope="scope">
-            <span>{{ scope.row.Name }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="最新版本号" width="150">
-          <template slot-scope="scope">
-            <span>{{ scope.row.Version }}</span>
-            <!--紧随其下的div只有在当行中Size=0时才显示 -->
-            <div style="display:inline-block;margin-left: 5px" v-if="scope.row.Size === '0B'">
-              <el-tooltip class="item" effect="dark"
-                          content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
-                          placement="left-end">
-                <el-tag size="mini" type="danger">
-                  <i class="el-icon-delete"></i>
-                </el-tag>
-              </el-tooltip>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="最新版本大小" width="150">
-          <template slot-scope="scope">
-            <span v-if="scope.row.Size !== '0B'">{{ scope.row.Size }}</span>
-            <!--紧随其下的span只有在当行中Size=0时才显示 -->
-            <span v-if="scope.row.Size === '0B'"> / </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="最新版本对象散列值">
-          <template slot-scope="scope">
-            <span v-if="scope.row.Size !== '0B'">{{ scope.row.Hash }}</span>
-            <!--紧随其下的span只有在当行中Size=0时才显示 -->
-            <span v-if="scope.row.Size === '0B'"> / </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="400">
-          <template slot-scope="scope">
-            <el-button
-                class="button el-buttons"
-                size="mini"
-                @click="handleDownload(scope.$index, scope.row)"
-                v-if="scope.row.Size !== '0B'">
-              <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
+    <table class="ui seven column  selectable inverted table" style="margin-top: 10px">
+      <thead>
+      <tr>
+        <th class="two wide"><font style="vertical-align: inherit;"><font
+            style="vertical-align: inherit;">对象名称</font></font>
+        </th>
+        <th class="two wide"><font style="vertical-align: inherit;"><font
+            style="vertical-align: inherit;">版本号</font></font>
+        </th>
+        <th class="two wide"><font style="vertical-align: inherit;"><font
+            style="vertical-align: inherit;">大小</font></font>
+        </th>
+        <th class="four wide" style="max-width: 100px!important;"><font style="vertical-align: inherit;"><font
+            style="vertical-align: inherit;">对象散列值</font></font>
+        </th>
+        <th class="five wide"><font style="vertical-align: inherit;"><font
+            style="vertical-align: inherit;">操作</font></font>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-if="tableData.length === 0">
+        <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+          暂无数据
+        </font></font>
+        </td>
+      </tr>
+
+      <tr v-for="(item,index) in tableData.Data" :key="index">
+        <td>
+          <span
+              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
+              item.Name
+            }}</span>
+        </td>
+        <td class="single line">
+          {{ item.Version }}
+          <div style="display:inline-block;margin-left: 5px" v-if="item.Size === '0B'">
+            <el-tooltip class="item" effect="dark"
+                        content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
+                        placement="left-start">
+              <el-tag size="mini" style="background-color: #848181;border: #848181;color: #ffffff">
+                <i class="el-icon-delete"></i>
+              </el-tag>
+            </el-tooltip>
+          </div>
+        </td>
+        <td class="single line"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+          {{ (item.Size !== '0B' ? item.Size : '/') }}
+        </font></font>
+        </td>
+
+        <td>
+          <span
+              style="max-width: 300px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
+              (item.Size !== '0B' ? item.Hash : '/')
+            }}</span>
+        </td>
+
+        <td>
+          <el-button
+              class="button el-buttons"
+              size="mini"
+              @click="handleDownload(index, item)"
+              v-if="item.Size !== '0B'">
+            <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">
+              <i class="download icon"></i>最新版本
+            </font></font></button>
+          </el-button>
+          <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
+          <el-button
+              class="button el-buttons"
+              size="mini"
+              @click="handleDownload(index, item)"
+              v-if="item.Size === '0B'"
+              disabled>
+            <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;">
+              <font style="vertical-align: inherit;"><font
                   style="vertical-align: inherit;">
                 <i class="download icon"></i>最新版本
               </font></font></button>
-            </el-button>
-            <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-            <el-button
-                class="button el-buttons"
-                size="mini"
-                @click="handleDownload(scope.$index, scope.row)"
-                v-if="scope.row.Size === '0B'"
-                disabled>
-              <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;">
-                <font style="vertical-align: inherit;"><font
-                    style="vertical-align: inherit;">
-                  <i class="download icon"></i>最新版本
-                </font></font></button>
-            </el-button>
-            <el-button
-                class="button el-buttons"
-                size="mini"
-                @click="handAll(scope.$index, scope.row)">
-              <button class="ui mini primary button" style="margin: 0"><font style="vertical-align: inherit;"><font
-                  style="vertical-align: inherit;">
-                <i class="server icon"></i>历史版本
-              </font></font></button>
-            </el-button>
-            <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)"
-                v-if="scope.row.Size !== '0B'">
-              <i class="trash alternate icon"></i><span style="font-weight:900">删除</span>
-            </el-button>
-            <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-            <el-button
-                size="mini"
-                style="background-color: #f5f5f5;color: #C0C4CC;border: transparent 0px dashed;"
-                @click="handleDelete(scope.$index, scope.row)"
-                v-if="scope.row.Size === '0B'"
-                disabled>
-              <i class="trash alternate icon"></i><span style="font-weight:600">删除</span>
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+          </el-button>
+          <el-button
+              class="button el-buttons"
+              size="mini"
+              @click="handAll(index, item)">
+            <button class="ui mini primary button" style="margin: 0"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">
+              <i class="server icon"></i>历史版本
+            </font></font></button>
+          </el-button>
+          <el-button
+              size="mini"
+              type="danger"
+              @click="handleDelete(index, item)"
+              v-if="item.Size !== '0B'">
+            <i class="trash alternate icon"></i><span style="font-weight:900">删除</span>
+          </el-button>
+          <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
+          <el-button
+              size="mini"
+              style="background-color: #f5f5f5;color: #C0C4CC;border: transparent 0px dashed;"
+              @click="handleDelete(index, item)"
+              v-if="item.Size === '0B'"
+              disabled>
+            <i class="trash alternate icon"></i><span style="font-weight:600">删除</span>
+          </el-button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+
     <!--
-      分页组件
-        1、在列表数据objDataSize长度为0的时候不显示
-        2、约定每页显示5条
-        3、总条数total为 objDataSize
-        4、切换页码的函数为handleCurrentChange
-    -->
+   分页组件
+     1、在列表数据objDataSize长度为0的时候不显示
+     2、约定每页显示5条
+     3、总条数total为 objDataSize
+     4、切换页码的函数为handleCurrentChange
+ -->
     <el-pagination
-        v-if="tableData.Size!==0"
+        v-if="tableData.length !==0 & tableData.Size!==0"
         :page-size="5"
         :pager-count="11"
         background
@@ -238,7 +293,6 @@
         </el-table-column>
       </el-table>
     </el-drawer>
-
   </div>
 </template>
 
@@ -254,7 +308,7 @@ export default {
       content: "",// 搜索框
       progressPercent: 0, // 上传进度条默认为0
       uploadProgressShow: false, // 上传进度条默认不显示
-      hashProgressShow:false,// 计算hash进度条默认不显示
+      hashProgressShow: false,// 计算hash进度条默认不显示
       uploadSliceFlag: false,// 分片 默认不显示
       drawer: false, // 其它版本的抽屉 是否显示flag
       tableData: [], // 全部对相列表 表格数据
@@ -266,6 +320,7 @@ export default {
     }
   },
   mounted() {
+    console.log()
     this.content = "" //加载组件时，搜索框内容为空
     this.getObjList(this.content, 1) // 默认获取第一页数据
   },
@@ -273,7 +328,6 @@ export default {
     // 上传对象
     async uploadRequest(param) {
       this.progressPercent = 0// 上传新文件时，将进度条值置为零
-
       if (param.file.size > 104857600) { //大于100M显示hash计算进度和弹窗
         this.hashProgressPercent = 0 // 进度条为0
         this.hashProgressShow = true // 进度条显示
@@ -356,9 +410,9 @@ export default {
 
       sha256.finalize();
       var hash = sha256._hash.toString()
-      console.log("js计算sha256值：" + hash)
+      // console.log("js计算sha256值：" + hash)
       var hashValue = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
-      console.log("散列值的base64编码" + hashValue)
+      // console.log("散列值的base64编码" + hashValue)
       return hashValue;
     },
 
@@ -564,9 +618,52 @@ export default {
 </script>
 
 <style>
+
 .ossadmin {
   width: 100%;
   height: 100%;
+}
+
+.gradient, .upload-demo {
+
+  --border-width: 2px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 170px;
+  font-family: Lato, sans-serif;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  color: white;
+  background: #1A1E23;
+  border-radius: 20px;
+}
+
+.gradient {
+  z-index: 1;
+  margin: 0 auto;
+}
+
+.upload-demo::after {
+  position: absolute;
+  content: "";
+  top: calc(-1 * 2px);
+  left: calc(-1 * 2px);
+  z-index: -1;
+  width: calc(100% + 2px * 2);
+  height: calc(100% + 2px * 2);
+  background-size: 300% 300% !important;
+  background: linear-gradient(60deg, #a19e9e, #8e8c8c, #6c6b6b, #4d4c4c, #f9f7f7, #a19e9e, #d8cccc, #b0adad) 0 50%;
+  border-radius: 20px;
+  animation: moveGradient 5s alternate infinite;
+}
+
+@keyframes moveGradient {
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .button {
@@ -595,5 +692,27 @@ export default {
   font-weight: bold;
   border-color: transparent !important;
 }
+
+.ui.icon.header .icon {
+  margin: 1px !important;
+}
+
+
+.el-upload-dragger {
+
+  border: 0px dashed #838181;
+  background-color: transparent;
+  border-radius: 30px;
+}
+
+
+/*.el-upload-dragger:hover {*/
+/*  border: 1px solid whitesmoke;*/
+/*}*/
+
+/*.el-upload:focus .el-upload-dragger {*/
+/*  border: 1px solid whitesmoke;*/
+/*}*/
+
 
 </style>

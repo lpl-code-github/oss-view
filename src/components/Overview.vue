@@ -25,10 +25,10 @@
         </tr>
         <tr v-for="(item,index) in HeartbeatTableData" :key="index">
           <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-            {{item.name }}</font></font>
+            {{ item.name }}</font></font>
           </td>
           <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-            {{item.value }}</font></font>
+            {{ item.value }}</font></font>
           </td>
           <td><font style="vertical-align: inherit;"><font
               style="vertical-align: inherit;">{{ item.date |dateFilter("yyy-mm-dd hh:mm:ss") }}</font></font>
@@ -223,7 +223,7 @@ export default {
         bgColor: "#cfcfcf",
         colors: [
           {color: "#30b313", percentage: 25},
-          {color: "#c9af09", percentage: 50},
+          {color: "#3d64ed", percentage: 50},
           {color: "#d57f08", percentage: 75},
           {color: "#b90101", percentage: 100},
         ],
