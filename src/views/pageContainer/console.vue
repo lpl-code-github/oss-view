@@ -21,13 +21,13 @@
           <nav>
             <ul>
               <li >
-                <router-link to="/overview"  class="active">节点监控</router-link>
+                <router-link id="overview" to="/overview"  class="active">节点监控</router-link>
               </li>
               <li>
-                <router-link to="/ossAdmin">对象管理</router-link>
+                <router-link id="ossAdmin" to="/ossAdmin">对象管理</router-link>
               </li>
               <li>
-                <router-link to="/system">系统维护</router-link>
+                <router-link id="system" to="/system">系统维护</router-link>
               </li>
             </ul>
           </nav>
@@ -37,7 +37,6 @@
       <el-main style="padding: 20px 20px 20px 20px">
         <router-view></router-view>
       </el-main>
-
 
       <el-footer>
         <Footer></Footer>
@@ -81,12 +80,13 @@ export default {
   created() {
   },
   mounted() {
-    console.log(this.$route.path);
+    var path = "#"+ this.$route.path.toString().replace("/", "")
+    // 通过路由判断该高亮哪个导航
+    $('nav').find('.active').removeClass('active');
+    $(path).addClass('active')
 
+    // 切换路由
     var nav = $('nav');
-    // nav.find('.active').removeClass('active');
-    // $('router-link:first').addClass('active')
-    // var nav = $('nav');
     nav.delegate('a', 'click', function (e) {
       nav.find('.active').removeClass('active');
       $(e.target).closest('a').addClass('active');
@@ -146,7 +146,7 @@ export default {
       border-radius: 90px;
       box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.05), inset 1px 1px 1px rgba(0, 0, 0, 0.3);
       left: 50%;
-      max-width: 1000px;
+      max-width: 95%;
       position: absolute;
       margin-top: 20px;
       transform: translate(-50%, -50%);
@@ -170,15 +170,15 @@ export default {
       background-color: #35393b;
       color: #fff;
       display: block;
-      line-height: 1em;
-      padding: 1em;
+      line-height: 10px;
+      padding: 10px;
       text-align: center;
       text-decoration: none;
       transition: all 100ms ease-out;
     }
 
     ul a:hover, ul a:active, ul a.active {
-      background-color: #2ba6cb;
+      background-color: #2185d0;
       box-shadow: inset 0 -0.3em 0 rgba(0, 0, 0, 0.3);
       margin-top: -0.3em;
       padding-bottom: 1.3em;
@@ -187,7 +187,7 @@ export default {
 
     ul a:hover:after, ul a:active:after, ul a.active:after {
       background-color: rgba(0, 0, 0, 0.05);
-      border-bottom: 1px solid rgba(43, 166, 203, 0.7);
+      border-bottom: 1px solid #2185d0;
       bottom: -0.5em;
       content: "";
       display: block;
@@ -237,15 +237,12 @@ export default {
     color: gray;
     //background-color: white;
     text-align: center;
-
     line-height: 50px;
-
     //height: 80px !important;
     //padding-top: 20px;
   }
 
   .el-main {
-
     margin-top: 10px;
     //background-color: white;
     color: #333;
