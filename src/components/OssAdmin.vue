@@ -41,7 +41,6 @@
           </div>
           <div class="column">
             <div class="gradient">
-              <!--              <div class="gradient-border">css<br/>is<br/>awesome</div>-->
               <el-upload
                   weight="100%"
                   ref="upload"
@@ -55,18 +54,6 @@
               </el-upload>
             </div>
 
-            <!--上传组件-->
-            <!--            <el-upload-->
-            <!--                weight="100%"-->
-            <!--                ref="upload"-->
-            <!--                action=""-->
-            <!--                class="upload-demo"-->
-            <!--                drag-->
-            <!--                :http-request="uploadRequest"-->
-            <!--                multiple>-->
-            <!--              <i class="el-icon-upload"></i>-->
-            <!--              <div class="el-upload__text">拖拽或<em>点击上传</em></div>-->
-            <!--            </el-upload>-->
             <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
               <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span
                   v-if="uploadSliceFlag">分片</span>上传进度：</span>
@@ -97,10 +84,10 @@
         <th class="two wide"><font style="vertical-align: inherit;"><font
             style="vertical-align: inherit;">大小</font></font>
         </th>
-        <th class="four wide" style="max-width: 100px!important;"><font style="vertical-align: inherit;"><font
+        <th class="five wide"><font style="vertical-align: inherit;"><font
             style="vertical-align: inherit;">对象散列值</font></font>
         </th>
-        <th class="five wide"><font style="vertical-align: inherit;"><font
+        <th class="two wide" style="text-align: center"><font style="vertical-align: inherit;"><font
             style="vertical-align: inherit;">操作</font></font>
         </th>
       </tr>
@@ -116,9 +103,7 @@
       <tr v-for="(item,index) in tableData.Data" :key="index">
         <td>
           <span
-              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
-              item.Name
-            }}</span>
+              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{item.Name}}</span>
         </td>
         <td class="single line">
           {{ item.Version }}
@@ -126,7 +111,7 @@
             <el-tooltip class="item" effect="dark"
                         content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
                         placement="left-start">
-              <el-tag size="mini" style="background-color: #848181;border: #848181;color: #ffffff">
+              <el-tag size="mini" style="background-color: #7c7b7b;border: #848181;color: #ffffff">
                 <i class="el-icon-delete"></i>
               </el-tag>
             </el-tooltip>
@@ -139,60 +124,72 @@
 
         <td>
           <span
-              style="max-width: 300px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
-              (item.Size !== '0B' ? item.Hash : '/')
-            }}</span>
+              style="max-width: 400px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
         </td>
 
-        <td>
-          <el-button
-              class="button el-buttons"
-              size="mini"
-              @click="handleDownload(index, item)"
-              v-if="item.Size !== '0B'">
-            <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
-                style="vertical-align: inherit;">
-              <i class="download icon"></i>最新版本
-            </font></font></button>
-          </el-button>
-          <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-          <el-button
-              class="button el-buttons"
-              size="mini"
-              @click="handleDownload(index, item)"
-              v-if="item.Size === '0B'"
-              disabled>
-            <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;">
-              <font style="vertical-align: inherit;"><font
-                  style="vertical-align: inherit;">
-                <i class="download icon"></i>最新版本
-              </font></font></button>
-          </el-button>
-          <el-button
-              class="button el-buttons"
-              size="mini"
-              @click="handAll(index, item)">
-            <button class="ui mini primary button" style="margin: 0"><font style="vertical-align: inherit;"><font
-                style="vertical-align: inherit;">
-              <i class="server icon"></i>历史版本
-            </font></font></button>
-          </el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(index, item)"
-              v-if="item.Size !== '0B'">
-            <i class="trash alternate icon"></i><span style="font-weight:900">删除</span>
-          </el-button>
-          <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-          <el-button
-              size="mini"
-              style="background-color: #f5f5f5;color: #C0C4CC;border: transparent 0px dashed;"
-              @click="handleDelete(index, item)"
-              v-if="item.Size === '0B'"
-              disabled>
-            <i class="trash alternate icon"></i><span style="font-weight:600">删除</span>
-          </el-button>
+        <td style="display: grid;place-items: center;width: 100%">
+          <!--          <el-button-->
+          <!--              class="button el-buttons"-->
+          <!--              size="mini"-->
+          <!--              @click="handleDownload(index, item)"-->
+          <!--              v-if="item.Size !== '0B'">-->
+          <!--            <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font-->
+          <!--                style="vertical-align: inherit;">-->
+          <!--              <i class="download icon"></i>最新版本-->
+          <!--            </font></font></button>-->
+          <!--          </el-button>-->
+          <!--          &lt;!&ndash;紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 &ndash;&gt;-->
+          <!--          <el-button-->
+          <!--              class="button el-buttons"-->
+          <!--              size="mini"-->
+          <!--              @click="handleDownload(index, item)"-->
+          <!--              v-if="item.Size === '0B'"-->
+          <!--              disabled>-->
+          <!--            <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;">-->
+          <!--              <font style="vertical-align: inherit;"><font-->
+          <!--                  style="vertical-align: inherit;">-->
+          <!--                <i class="download icon"></i>最新版本-->
+          <!--              </font></font></button>-->
+          <!--          </el-button>-->
+          <!--          <el-button-->
+          <!--              class="button el-buttons"-->
+          <!--              size="mini"-->
+          <!--              @click="handAll(index, item)">-->
+          <!--            <button class="ui mini primary button" style="margin: 0"><font style="vertical-align: inherit;"><font-->
+          <!--                style="vertical-align: inherit;">-->
+          <!--              <i class="server icon"></i>历史版本-->
+          <!--            </font></font></button>-->
+          <!--          </el-button>-->
+          <!--          <el-button-->
+          <!--              size="mini"-->
+          <!--              type="danger"-->
+          <!--              @click="handleDelete(index, item)"-->
+          <!--              v-if="item.Size !== '0B'">-->
+          <!--            <i class="trash alternate icon"></i><span style="font-weight:900">删除</span>-->
+          <!--          </el-button>-->
+          <!--          &lt;!&ndash;紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 &ndash;&gt;-->
+          <!--          <el-button-->
+          <!--              size="mini"-->
+          <!--              style="background-color: #f5f5f5;color: #C0C4CC;border: transparent 0px dashed;"-->
+          <!--              @click="handleDelete(index, item)"-->
+          <!--              v-if="item.Size === '0B'"-->
+          <!--              disabled>-->
+          <!--            <i class="trash alternate icon"></i><span style="font-weight:600">删除</span>-->
+          <!--          </el-button>-->
+          <div class="multi-button">
+            <button @click="handleDownload(index, item)" :disabled="(item.Size === '0B'? true:false)" :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')" >
+              <i class=" download icon"></i>
+              <div class="animate-normal ">下载最新版本</div>
+            </button>
+            <button @click="handAll(index, item)">
+              <i class=" server icon"></i>
+              <div class="animate-normal ">查看历史版本</div>
+            </button>
+            <button @click="handleDelete(index, item)" :disabled="(item.Size === '0B'? true:false)" :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
+              <i class=" trash alternate icon"></i>
+              <div class="animate-normal ">删除</div>
+            </button>
+          </div>
         </td>
       </tr>
       </tbody>
@@ -625,7 +622,6 @@ export default {
 }
 
 .gradient, .upload-demo {
-
   --border-width: 2px;
   position: relative;
   display: flex;
@@ -697,22 +693,118 @@ export default {
   margin: 1px !important;
 }
 
-
 .el-upload-dragger {
-
   border: 0px dashed #838181;
   background-color: transparent;
   border-radius: 30px;
 }
 
+.multi-button {
+  display: flex;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 50px;
+  background: rgba(0,0,0,.15);
+  /*border: 0.5px solid rgba(146, 152, 176, 0.4);*/
+  background: linear-gradient(60deg, #8d8b8b, #807e7e, #a9a5a5, #716e6e) 0 50% ;
+  box-shadow: 0 0 10px rgba(200, 203, 217, 0.2), 4px 4px 10px rgba(113, 119, 144, 0.2);
+  cursor: default;
+}
 
-/*.el-upload-dragger:hover {*/
-/*  border: 1px solid whitesmoke;*/
-/*}*/
+.multi-button button {
+  width: calc(100% / 3);
+  border: 0 solid transparent;
+  background: transparent;
+  padding: 10px 30px;
+  /*margin: 0 -2px;*/
+  /*color: #114cce;*/
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  top: 0;
+  left: 0;
+  outline: none;
+  transition: background 0.2s ease-in-out;
+}
 
-/*.el-upload:focus .el-upload-dragger {*/
-/*  border: 1px solid whitesmoke;*/
-/*}*/
+.multi-button button:first-child {
+  border-top-left-radius: 40px;
+  border-bottom-left-radius: 40px;
+}
+
+.multi-button button:last-child {
+  border-top-right-radius: 40px;
+  border-bottom-right-radius: 40px;
+}
+
+.multi-button button div {
+  position: absolute;
+  top: -43px;
+  left: calc(50% - 60px);
+  width: 130px;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(63, 64, 68, 0.8);
+  border-radius: 16px;
+  line-height: 30px;
+  font-family: "Raleway", Arial, sans-serif;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 1px;
+  box-shadow: 0 0 5px rgba(39, 48, 68, 0.3), 1px 1px 5px rgba(39, 48, 68, 0.2);
+  display: none;
+  cursor: pointer;
+}
+
+.multi-button button:hover {
+  background: #c3c3c7;
+}
+
+.multi-button button:hover div {
+  display: block;
+  animation: tooltip-animation-normal 0.3s ease-out forwards;
+}
+
+.multi-button button:hover div.animate-right {
+  animation: tooltip-animation-right 0.3s ease-out forwards;
+}
+
+.multi-button button:hover div.animate-left {
+  animation: tooltip-animation-left 0.3s ease-out forwards;
+}
+
+.multi-button button:active {
+  outline: none;
+  background: #d6d8e1;
+}
+
+@keyframes tooltip-animation-right {
+  0% {
+    transform: translateX(-75px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltip-animation-left {
+  0% {
+    transform: translateX(75px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltip-animation-normal {
+  0% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
 
 
 </style>
