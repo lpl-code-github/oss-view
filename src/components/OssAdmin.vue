@@ -1,8 +1,6 @@
 <!--对象管理-->
 <template>
-
   <div class="ossadmin">
-
     <!-- 查找 and 上传-->
     <div class="ui  placeholder segment" style="background-color: transparent">
       <div class="ui two column stackable center aligned grid">
@@ -147,14 +145,13 @@
       </tbody>
     </table>
 
-
     <!--
    分页组件
      1、在列表数据objDataSize长度为0的时候不显示
      2、约定每页显示5条
      3、总条数total为 objDataSize
      4、切换页码的函数为handleCurrentChange
- -->
+     -->
     <el-pagination
         v-if="tableData.length !==0 & tableData.Size!==0"
         :page-size="5"
@@ -248,7 +245,6 @@
 <script>
 import CryptoJS from 'crypto-js/crypto-js'
 import fileDownload from 'js-file-download';
-
 export default {
   name: 'OssAdmin',
   data() {
@@ -757,6 +753,5 @@ export default {
     transform: translateY(0);
   }
 }
-
 
 </style>
