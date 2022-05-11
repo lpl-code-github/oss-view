@@ -128,54 +128,6 @@
         </td>
 
         <td style="display: grid;place-items: center;width: 100%">
-          <!--          <el-button-->
-          <!--              class="button el-buttons"-->
-          <!--              size="mini"-->
-          <!--              @click="handleDownload(index, item)"-->
-          <!--              v-if="item.Size !== '0B'">-->
-          <!--            <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font-->
-          <!--                style="vertical-align: inherit;">-->
-          <!--              <i class="download icon"></i>最新版本-->
-          <!--            </font></font></button>-->
-          <!--          </el-button>-->
-          <!--          &lt;!&ndash;紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 &ndash;&gt;-->
-          <!--          <el-button-->
-          <!--              class="button el-buttons"-->
-          <!--              size="mini"-->
-          <!--              @click="handleDownload(index, item)"-->
-          <!--              v-if="item.Size === '0B'"-->
-          <!--              disabled>-->
-          <!--            <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;">-->
-          <!--              <font style="vertical-align: inherit;"><font-->
-          <!--                  style="vertical-align: inherit;">-->
-          <!--                <i class="download icon"></i>最新版本-->
-          <!--              </font></font></button>-->
-          <!--          </el-button>-->
-          <!--          <el-button-->
-          <!--              class="button el-buttons"-->
-          <!--              size="mini"-->
-          <!--              @click="handAll(index, item)">-->
-          <!--            <button class="ui mini primary button" style="margin: 0"><font style="vertical-align: inherit;"><font-->
-          <!--                style="vertical-align: inherit;">-->
-          <!--              <i class="server icon"></i>历史版本-->
-          <!--            </font></font></button>-->
-          <!--          </el-button>-->
-          <!--          <el-button-->
-          <!--              size="mini"-->
-          <!--              type="danger"-->
-          <!--              @click="handleDelete(index, item)"-->
-          <!--              v-if="item.Size !== '0B'">-->
-          <!--            <i class="trash alternate icon"></i><span style="font-weight:900">删除</span>-->
-          <!--          </el-button>-->
-          <!--          &lt;!&ndash;紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 &ndash;&gt;-->
-          <!--          <el-button-->
-          <!--              size="mini"-->
-          <!--              style="background-color: #f5f5f5;color: #C0C4CC;border: transparent 0px dashed;"-->
-          <!--              @click="handleDelete(index, item)"-->
-          <!--              v-if="item.Size === '0B'"-->
-          <!--              disabled>-->
-          <!--            <i class="trash alternate icon"></i><span style="font-weight:600">删除</span>-->
-          <!--          </el-button>-->
           <div class="multi-button">
             <button @click="handleDownload(index, item)" :disabled="(item.Size === '0B'? true:false)" :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')" >
               <i class=" download icon"></i>
