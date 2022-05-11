@@ -7,21 +7,22 @@
           <img src="../../assets/img/logo.png" alt="">
           <div style="font-size: 20px;color: #99a9bf"> LPL对象存储控制台</div>
         </div>
-        <div style="font-size: 18px;color: #99a9bf;margin-right: 20px" @click="toHome">回到首页</div>
+        <div id="container" style="margin-right: 30px">
+          <button class="learn-more" @click="toHome">
+              <span class="circle" aria-hidden="true">
+                <span class="icon arrow"></span>
+              </span>
+            <span class="button-text">回到首页</span>
+          </button>
+        </div>
       </div>
 
       <el-header>
-        <!--        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>-->
-        <!--          <el-menu-item index="/overview">节点监控</el-menu-item>-->
-        <!--          <el-menu-item index="/ossAdmin">对象管理</el-menu-item>-->
-        <!--          <el-menu-item index="/system">系统维护</el-menu-item>-->
-        <!--        </el-menu>-->
-
         <headers>
           <nav>
             <ul>
-              <li >
-                <router-link id="overview" to="/overview"  class="active">节点监控</router-link>
+              <li>
+                <router-link id="overview" to="/overview" class="active">节点监控</router-link>
               </li>
               <li>
                 <router-link id="ossAdmin" to="/ossAdmin">对象管理</router-link>
@@ -80,7 +81,7 @@ export default {
   created() {
   },
   mounted() {
-    var path = "#"+ this.$route.path.toString().replace("/", "")
+    var path = "#" + this.$route.path.toString().replace("/", "")
     // 通过路由判断该高亮哪个导航
     $('nav').find('.active').removeClass('active');
     $(path).addClass('active')
@@ -106,6 +107,7 @@ export default {
   .el-container.is-vertical {
     height: 100%;
   }
+
   .header {
     display: flex;
     align-items: center;
@@ -118,7 +120,7 @@ export default {
     overflow: hidden;
 
     .header-left-box {
-      margin: 10px 0px 20px 20px;
+      margin: 10px 0px 25px 25px;
       display: flex;
       align-items: center;
       font-size: 18px;
@@ -146,7 +148,7 @@ export default {
       border-radius: 90px;
       box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.05), inset 1px 1px 1px rgba(0, 0, 0, 0.3);
       left: 50%;
-      max-width: 95%;
+      max-width: 97%;
       position: absolute;
       margin-top: 20px;
       transform: translate(-50%, -50%);
@@ -262,6 +264,100 @@ export default {
 
   .el-container:nth-child(7) .el-aside {
     line-height: 320px;
+  }
+
+  button {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+    border: 0;
+    vertical-align: middle;
+    text-decoration: none;
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+  }
+  button.learn-more {
+    width: 10rem;
+    height: auto;
+  }
+  button.learn-more .circle {
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    position: relative;
+    display: block;
+    margin: 0;
+    width: 3rem;
+    height: 3rem;
+    background: #282936;
+    border-radius: 1.625rem;
+  }
+  button.learn-more .circle .icon {
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background: #fff;
+  }
+  button.learn-more .circle .icon.arrow {
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    left: 0.625rem;
+    width: 1.125rem;
+    height: 0.125rem;
+    background: none;
+  }
+  button.learn-more .circle .icon.arrow::before {
+    position: absolute;
+    content: "";
+    top: -0.25rem;
+    right: 0.0625rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-top: 0.125rem solid #fff;
+    border-right: 0.125rem solid #fff;
+    transform: rotate(45deg);
+  }
+  button.learn-more .button-text {
+    transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.75rem 0;
+    margin: 0 0 0 1.85rem;
+    color: #959598;
+    font-weight: 700;
+    line-height: 1.6;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  button:hover .circle {
+    width: 100%;
+  }
+  button:hover .circle .icon.arrow {
+    background: #fff;
+    transform: translate(1rem, 0);
+  }
+  button:hover .button-text {
+    color: #fff;
+  }
+
+  @supports (display: grid) {
+    body {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 0.625rem;
+      grid-template-areas: ". main main ." ". main main .";
+    }
+
+    #container {
+      grid-area: main;
+      align-self: center;
+      justify-self: center;
+    }
   }
 }
 </style>
