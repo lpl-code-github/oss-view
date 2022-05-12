@@ -12,12 +12,39 @@ export const getNodeSystemInfo = (params) => {
         .get('/nodeSystemInfo/' + params)
         .then(res => res)
 }
+// 获取桶列表
+export const getBucketList = params => {
+    return service
+        .get('/bucket/' + params)
+        .then(res => res)
+}
+
+
+// 新增桶
+export const addBucket = params => {
+    return service
+        .request({
+            url: '/bucket/',
+            method: 'PUT',
+            headers: {
+                'bucket': params
+            },
+        })
+        .then(res => res)
+}
 
 // 对象最新版本分页列表api
-export const getObjLists = params => {
+export const getObjLists = (params, bucket) => {
     return service
-        .get('/allVersions/' + params)
+        .request({
+            url: '/allVersions/' + params,
+            method: 'GET',
+            headers: {
+                'bucket': bucket
+            },
+        })
         .then(res => res)
+
 }
 
 // 单个对象其它版本列表api
@@ -35,14 +62,15 @@ export const getObj = params => {
 }
 
 // 普通上传api
-export const uploadObj = (params, data, hash, onUploadProgress) => {
+export const uploadObj = (params, data, hash, bucket, onUploadProgress) => {
     return service
         .request({
             url: '/objects/' + params,
             method: 'PUT',
             data: data,
             headers: {
-                'Digest': 'SHA-256=' + hash
+                'Digest': 'SHA-256=' + hash,
+                'bucket': bucket
             },
             onUploadProgress
         })
@@ -71,7 +99,7 @@ export const headUploadSliceProgress = (params) => {
 
 
 // 分片上传对象api
-export const uploadSlice = (params, data, range,onUploadProgress) => {
+export const uploadSlice = (params, data, range, onUploadProgress) => {
     return service
         .request({
             url: params,
