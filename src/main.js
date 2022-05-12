@@ -11,6 +11,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 // 引入semantic-ui
 import SuiVue from 'semantic-ui-vue'
 import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/semantic.min.js'
 // 引入公共css
 import './assets/css/common.css'
 // 引入封装好的axios请求
