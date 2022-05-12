@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
     productionSourceMap: false,//防止打包生成map文件
     publicPath: './', // 基本路径
@@ -19,5 +21,14 @@ module.exports = {
                 }
             }
         }
-    }
-}
+    },
+    configureWebpack: {
+        plugins: [
+            new webpack.ProvidePlugin({
+                $: 'jquery',
+                jQuery: 'jquery',
+                'windows.jQuery': 'jquery',
+            }),
+        ],
+    },
+};
