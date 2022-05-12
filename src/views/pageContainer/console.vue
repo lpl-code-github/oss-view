@@ -25,7 +25,7 @@
                 <router-link id="overview" to="/overview" class="active">节点监控</router-link>
               </li>
               <li>
-                <router-link id="ossAdmin" to="/ossAdmin">对象管理</router-link>
+                <router-link id="ossAdmin" to="/ossAdmin">桶/对象管理</router-link>
               </li>
               <li>
                 <router-link id="system" to="/system">系统维护</router-link>
@@ -36,7 +36,7 @@
       </el-header>
 
       <el-main style="padding: 20px 20px 20px 20px">
-        <router-view></router-view>
+        <router-view v-if="isRouterAlive"></router-view>
       </el-main>
 
       <el-footer>
@@ -65,27 +65,38 @@ export default {
     OssAdmin,
     System
   },
+  provide () {    //父组件中通过provide来提供变量，在子组件中通过inject来注入变量
+    return {
+      reload: this.reload
+    }
+  },
   data() {
-    return {}
+    return {
+      isRouterAlive: true   //控制视图是否显示的变量
+    }
   },
   computed: {},
   watch: {},
-
   methods: {
+    reload () {
+      this.isRouterAlive = false;   //先关闭，
+      this.$nextTick(function () {
+        this.isRouterAlive = true;  //再打开
+      })
+    },
     toHome() {
       this.$router.push("/")
     }
   },
   created() {
   },
-  mounted() {
-    var path = "#" + this.$route.path.toString().replace("/", "")
-    // 通过路由判断该高亮哪个导航
-    $('nav').find('.active').removeClass('active');
-    $(path).addClass('active')
 
-    // 切换路由
+  mounted() {
     var nav = $('nav');
+    nav.find('.active').removeClass('active');
+    var path = "#" + this.$route.path.toString().replace("/", "")
+    $(path).addClass("active")
+    // 切换路由
     nav.delegate('a', 'click', function (e) {
       nav.find('.active').removeClass('active');
       $(e.target).closest('a').addClass('active');
