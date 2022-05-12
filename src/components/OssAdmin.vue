@@ -1,254 +1,281 @@
 <!--对象管理-->
 <template>
   <div class="ossadmin">
-    <!-- 查找 and 上传-->
-    <div class="ui  placeholder segment" style="background-color: transparent">
-      <div class="ui two column stackable center aligned grid">
-        <div class="ui inverted vertical divider">Or</div>
-        <div class="middle aligned row">
-          <div class="column">
-            <div class="ui inverted icon header">
-              <i class="search icon"></i>
-              <div class="wrapper-header">
-                <span>S</span>
-                <span>e</span>
-                <span>a</span>
-                <span>r</span>
-                <span>c</span>
-                <span>h</span>
-                &nbsp;
-                <span>O</span>
-                <span>b</span>
-                <span>j</span>
-                <span>e</span>
-                <span>c</span>
-                <span>t</span>
-              </div>
-            </div>
-            <div class="field">
-              <div class="ui search">
-                <div class="ui icon input">
-                  <!--搜索输入框-->
-                  <input v-model.trim="content" @input="getObjList(content,1)" class="prompt" type="text"
-                         placeholder="Input Object Name">
-                  <i class="search icon"></i>
-                </div>
-                <div class="results"></div>
-              </div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="gradient">
-              <el-upload
-                  weight="100%"
-                  ref="upload"
-                  action=""
-                  class="upload-demo"
-                  drag
-                  :http-request="uploadRequest"
-                  multiple>
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text" style="color: #d8cccc">拖拽或<em>点击上传</em></div>
-              </el-upload>
-            </div>
+    <Bucket class="bucket" v-if="!objectInfoShow"></Bucket>
 
-            <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
+    <div class="object" v-if="objectInfoShow">
+      <div style="display: flex;align-items: center;justify-content:space-between;margin: -20px 20px 0px 20px">
+        <div style="left:0;text-align: left;font-size: 20px;color:#b0adad;font-weight: bolder">对象管理</div>
+        <div class="ui left labeled button" tabindex="0" style="margin-left: 25px;">
+          <a class="ui right pointing  label" style="background: #bdbdbd"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">
+            当前桶：{{ bucketName }}
+          </font></font></a>
+          <div class="ui basic  button" @click="switchBucket()">
+            <i class="exchange icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">切换桶
+          </font></font></div>
+
+        </div>
+      </div>
+      <!-- 查找 and 上传-->
+      <div class="ui  placeholder segment" style="background-color: transparent">
+        <div class="ui two column stackable center aligned grid">
+          <div class="ui inverted vertical divider">Or</div>
+          <div class="middle aligned row">
+            <div class="column">
+              <div class="ui inverted icon header">
+                <i class="search icon"></i>
+                <div class="wrapper-header">
+                  <span>S</span>
+                  <span>e</span>
+                  <span>a</span>
+                  <span>r</span>
+                  <span>c</span>
+                  <span>h</span>
+                  &nbsp;
+                  <span>O</span>
+                  <span>b</span>
+                  <span>j</span>
+                  <span>e</span>
+                  <span>c</span>
+                  <span>t</span>
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui search">
+                  <div class="ui icon input">
+                    <!--搜索输入框-->
+                    <input v-model.trim="content" @input="getObjList(content,1)" class="prompt" type="text"
+                           placeholder="Input Object Name">
+                    <i class="search icon"></i>
+                  </div>
+                  <div class="results"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="gradient">
+                <el-upload
+                    weight="100%"
+                    ref="upload"
+                    action=""
+                    class="upload-demo"
+                    drag
+                    :http-request="uploadRequest"
+                    multiple>
+                  <i class="el-icon-upload"></i>
+                  <div class="el-upload__text" style="color: #d8cccc">拖拽或<em>点击上传</em></div>
+                </el-upload>
+              </div>
+
+              <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
               <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span
                   v-if="uploadSliceFlag">分片</span>上传进度：</span>
-              <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}"
-                           :text-inside="true"
-                           :stroke-width="15"
-                           :percentage="progressPercent"></el-progress>
-              <span v-if="hashProgressShow" style="width:20%">上传前准备工作：</span>
-              <el-progress v-if="hashProgressShow" style="width:80%" :text-inside="true"
-                           :stroke-width="15"
-                           :percentage="hashProgressPercent"></el-progress>
+                <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}"
+                             :text-inside="true"
+                             :stroke-width="15"
+                             :percentage="progressPercent"></el-progress>
+                <span v-if="hashProgressShow" style="width:20%">上传前准备工作：</span>
+                <el-progress v-if="hashProgressShow" style="width:80%" :text-inside="true"
+                             :stroke-width="15"
+                             :percentage="hashProgressPercent"></el-progress>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <!--  对象信息列表  -->
+      <table class="ui seven column  selectable inverted table" style="margin-top: 10px">
+        <thead>
+        <tr>
+          <th class="two wide"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">对象名称</font></font>
+          </th>
+          <th class="two wide"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">版本号</font></font>
+          </th>
+          <th class="two wide"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">大小</font></font>
+          </th>
+          <th class="five wide"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">对象散列值</font></font>
+          </th>
+          <th class="two wide" style="text-align: center"><font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">操作</font></font>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-if="tableData.Size === 0">
+          <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            暂无数据
+          </font></font>
+          </td>
+        </tr>
 
-    <!--  对象信息列表  -->
-    <table class="ui seven column  selectable inverted table" style="margin-top: 10px">
-      <thead>
-      <tr>
-        <th class="two wide"><font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">对象名称</font></font>
-        </th>
-        <th class="two wide"><font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">版本号</font></font>
-        </th>
-        <th class="two wide"><font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">大小</font></font>
-        </th>
-        <th class="five wide"><font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">对象散列值</font></font>
-        </th>
-        <th class="two wide" style="text-align: center"><font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">操作</font></font>
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-if="tableData.length === 0">
-        <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          暂无数据
-        </font></font>
-        </td>
-      </tr>
-
-      <tr v-for="(item,index) in tableData.Data" :key="index">
-        <td>
+        <tr v-for="(item,index) in tableData.Data" :key="index">
+          <td>
           <span
-              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{item.Name}}</span>
-        </td>
-        <td class="single line">
-          {{ item.Version }}
-          <div style="display:inline-block;margin-left: 5px" v-if="item.Size === '0B'">
-            <el-tooltip class="item" effect="dark"
-                        content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
-                        placement="left-start">
-              <el-tag size="mini" style="background-color: #7c7b7b;border: #848181;color: #ffffff">
-                <i class="el-icon-delete"></i>
-              </el-tag>
-            </el-tooltip>
-          </div>
-        </td>
-        <td class="single line"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          {{ (item.Size !== '0B' ? item.Size : '/') }}
-        </font></font>
-        </td>
-
-        <td>
-          <span
-              style="max-width: 400px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
-        </td>
-
-        <td style="display: grid;place-items: center;width: 100%">
-          <div class="multi-button">
-            <button @click="handleDownload(index, item)" :disabled="(item.Size === '0B'? true:false)" :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')" >
-              <i class=" download icon"></i>
-              <div class="animate-normal ">下载最新版本</div>
-            </button>
-            <button @click="handAll(index, item)">
-              <i class=" server icon"></i>
-              <div class="animate-normal ">查看历史版本</div>
-            </button>
-            <button @click="handleDelete(index, item)" :disabled="(item.Size === '0B'? true:false)" :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
-              <i class=" trash alternate icon"></i>
-              <div class="animate-normal ">删除</div>
-            </button>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <!--
-   分页组件
-     1、在列表数据objDataSize长度为0的时候不显示
-     2、约定每页显示5条
-     3、总条数total为 objDataSize
-     4、切换页码的函数为handleCurrentChange
-     -->
-    <el-pagination
-        v-if="tableData.length !==0 & tableData.Size!==0"
-        :page-size="5"
-        :pager-count="11"
-        background
-        :current-page="1"
-        @current-change="handleCurrentChange"
-        layout="prev, pager, next"
-        :total="tableData.Size">
-    </el-pagination>
-
-    <!--查看某个对象历史版本的抽屉组件-->
-    <el-drawer
-        ref="upload"
-        size="50%"
-        title="全部版本"
-        :with-header="false"
-        :visible.sync="drawer">
-      <p style="text-align: center;margin: 20px;font-size: 16px;color: gray">[ {{ objName }} ] 历史版本</p>
-      <!--抽屉中是table组件-->
-      <el-table
-          :data="othersVersion"
-          style="width: 100%">
-        <el-table-column
-            label="版本"
-            width="80">
-          <template slot-scope="scope">
-            <span>{{ scope.row.Version }}</span>
-            <!--紧随其下的div只有在当行中Size=0时才显示 -->
-            <div style="display:inline-block;margin-left: 5px" v-if="scope.row.Size === '0B'">
+              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
+              item.Name
+            }}</span>
+          </td>
+          <td class="single line">
+            {{ item.Version }}
+            <div style="display:inline-block;margin-left: 5px" v-if="item.Size === '0B'">
               <el-tooltip class="item" effect="dark"
                           content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
-                          placement="left-end">
-                <el-tag size="mini" type="danger">
+                          placement="left-start">
+                <el-tag size="mini" style="background-color: #7c7b7b;border: #848181;color: #ffffff">
                   <i class="el-icon-delete"></i>
                 </el-tag>
               </el-tooltip>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-            label="大小"
-            width="100">
-          <template slot-scope="scope">
-            <span v-if="scope.row.Size != '0B'">{{ scope.row.Size }}</span>
-            <!--紧随其下的span只有在当行中Size=0时才显示 -->
-            <span v-if="scope.row.Size === '0B'"> / </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-            label="散列值">
-          <template slot-scope="scope">
-            <span>{{ scope.row.Hash }}</span>
-            <!--紧随其下的span只有在当行中Size=0时才显示 -->
-            <span v-if="scope.row.Size === '0B'"> / </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-            label="操作"
-            width="150">
-          <template slot-scope="scope">
-            <el-button
-                class="button el-buttons"
-                size="mini"
-                @click="handleDownloadOther(scope.$index, scope.row)"
-                v-if="scope.row.Size !== '0B'">
-              <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
-                  style="vertical-align: inherit;">
-                <i class="download icon"></i>下载
-              </font></font></button>
-            </el-button>
-            <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-            <el-button
-                class="button el-buttons"
-                size="mini"
-                v-if="scope.row.Size === '0B'"
-                disabled>
-              <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;"><font
-                  style="vertical-align: inherit;"><font
-                  style="vertical-align: inherit;">
-                <i class="download icon"></i>下载
-              </font></font></button>
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-drawer>
+          </td>
+          <td class="single line"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            {{ (item.Size !== '0B' ? item.Size : '/') }}
+          </font></font>
+          </td>
+
+          <td>
+          <span
+              style="max-width: 400px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
+          </td>
+
+          <td style="display: grid;place-items: center;width: 100%">
+            <div class="multi-button">
+              <button @click="handleDownload(index, item)" :disabled="(item.Size === '0B'? true:false)"
+                      :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
+                <i class=" download icon"></i>
+                <div class="animate-normal ">下载最新版本</div>
+              </button>
+              <button @click="handAll(index, item)">
+                <i class=" server icon"></i>
+                <div class="animate-normal ">查看历史版本</div>
+              </button>
+              <button @click="handleDelete(index, item)" :disabled="(item.Size === '0B'? true:false)"
+                      :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
+                <i class=" trash alternate icon"></i>
+                <div class="animate-normal ">删除</div>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!--
+     分页组件
+       1、在列表数据tableData长度为0的时候不显示
+       2、约定每页显示5条
+       3、总条数total为 tableDataSize
+       4、切换页码的函数为handleCurrentChange
+       -->
+      <el-pagination
+          v-if="tableData.length !==0 & tableData.Size!==0"
+          :page-size="5"
+          :pager-count="11"
+          background
+          :current-page="1"
+          @current-change="handleCurrentChange"
+          layout="prev, pager, next"
+          :total="tableData.Size">
+      </el-pagination>
+
+      <!--查看某个对象历史版本的抽屉组件-->
+      <el-drawer
+          ref="upload"
+          size="50%"
+          title="全部版本"
+          :with-header="false"
+          :visible.sync="drawer">
+        <p style="text-align: center;margin: 20px;font-size: 16px;color: gray">[ {{ objName }} ] 历史版本</p>
+        <!--抽屉中是table组件-->
+        <el-table
+            :data="othersVersion"
+            style="width: 100%">
+          <el-table-column
+              label="版本"
+              width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.Version }}</span>
+              <!--紧随其下的div只有在当行中Size=0时才显示 -->
+              <div style="display:inline-block;margin-left: 5px" v-if="scope.row.Size === '0B'">
+                <el-tooltip class="item" effect="dark"
+                            content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
+                            placement="left-end">
+                  <el-tag size="mini" type="danger">
+                    <i class="el-icon-delete"></i>
+                  </el-tag>
+                </el-tooltip>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+              label="大小"
+              width="100">
+            <template slot-scope="scope">
+              <span v-if="scope.row.Size != '0B'">{{ scope.row.Size }}</span>
+              <!--紧随其下的span只有在当行中Size=0时才显示 -->
+              <span v-if="scope.row.Size === '0B'"> / </span>
+            </template>
+          </el-table-column>
+          <el-table-column
+              label="散列值">
+            <template slot-scope="scope">
+              <span>{{ scope.row.Hash }}</span>
+              <!--紧随其下的span只有在当行中Size=0时才显示 -->
+              <span v-if="scope.row.Size === '0B'"> / </span>
+            </template>
+          </el-table-column>
+          <el-table-column
+              label="操作"
+              width="150">
+            <template slot-scope="scope">
+              <el-button
+                  class="button el-buttons"
+                  size="mini"
+                  @click="handleDownloadOther(scope.$index, scope.row)"
+                  v-if="scope.row.Size !== '0B'">
+                <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
+                    style="vertical-align: inherit;">
+                  <i class="download icon"></i>下载
+                </font></font></button>
+              </el-button>
+              <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
+              <el-button
+                  class="button el-buttons"
+                  size="mini"
+                  v-if="scope.row.Size === '0B'"
+                  disabled>
+                <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;"><font
+                    style="vertical-align: inherit;"><font
+                    style="vertical-align: inherit;">
+                  <i class="download icon"></i>下载
+                </font></font></button>
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-drawer>
+    </div>
   </div>
+
 </template>
 
 <script>
 import CryptoJS from 'crypto-js/crypto-js'
 import fileDownload from 'js-file-download';
+import Bucket from "@/components/Bucket";
+import $ from "jquery"
+
 export default {
   name: 'OssAdmin',
+  components: {Bucket},
   data() {
     return {
+      objectInfoShow: false, // 是否显示对象信息列表
+      bucketName: "",//当前桶名称
       objName: "",// 某行操作按钮点击时获取的对象name
       content: "",// 搜索框
       progressPercent: 0, // 上传进度条默认为0
@@ -264,12 +291,37 @@ export default {
       notification: null,// 计算hash消息通知默认不关闭
     }
   },
+  // beforeDestroy() {// 实例销毁之前调用
+  //   sessionStorage.removeItem("bucketName")
+  // },
   mounted() {
-    console.log()
+    // 初始化组件先检查是否有桶名标记
+    if (sessionStorage.getItem("bucketName") === null | sessionStorage.getItem("bucketName") === "") {
+      this.objectInfoShow = false
+    } else {
+      this.bucketName = sessionStorage.getItem("bucketName")
+      setTimeout(() => {
+        this.objectInfoShow = true
+      }, 0);
+      setTimeout(() => {
+        $('.object').transition('pulse');
+      }, 0);
+    }
     this.content = "" //加载组件时，搜索框内容为空
     this.getObjList(this.content, 1) // 默认获取第一页数据
   },
   methods: {
+    // 切换桶
+    switchBucket() {
+      $('.object').transition('fade');
+      setTimeout(() => {
+        this.objectInfoShow = false
+      }, 200);
+      setTimeout(() => {
+        $('.bucket').transition('pulse');
+      }, 200);
+    },
+
     // 上传对象
     async uploadRequest(param) {
       this.progressPercent = 0// 上传新文件时，将进度条值置为零
@@ -374,7 +426,8 @@ export default {
 
     // 文件普通上传
     uploadObj(param, hash, uploadProgressEvent) {
-      this.$request.uploadObj(param.file.name, param.file, hash, uploadProgressEvent).then(val => {
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+      this.$request.uploadObj(param.file.name, param.file, hash,bucket, uploadProgressEvent).then(val => {
         if (val.status === 200) {
           this.$message.success("上传成功")
         } else {
@@ -504,7 +557,7 @@ export default {
           if (val.status == 200) {
             this.$message.success("删除成功")
           } else {
-            this.$message.success("删除失败")
+            this.$message.error("删除失败")
           }
         }).finally(() => {
           // 发送请求后重新获取全部对象列表数据
@@ -524,7 +577,8 @@ export default {
 
     // 获得全部对象列表
     getObjList(name, page) {
-      this.$request.getObjLists(name + "?page=" + page).then(val => {
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+      this.$request.getObjLists(name + "?page=" + page, bucket).then(val => {
         if (val.status === 200) {
           // 把接口数据中的size单位B重新设置为KB、MB、GB等单位
           for (let valKey in val.data.Data) {
@@ -589,7 +643,11 @@ export default {
   z-index: 1;
   margin: 0 auto;
 }
-
+.ui.placeholder.segment{
+  background-color: transparent;
+  box-shadow: none;
+  border: 0px;
+}
 .upload-demo::after {
   position: absolute;
   content: "";
@@ -652,9 +710,9 @@ export default {
   width: 100%;
   padding: 8px 10px;
   border-radius: 50px;
-  background: rgba(0,0,0,.15);
+  background: rgba(0, 0, 0, .15);
   /*border: 0.5px solid rgba(146, 152, 176, 0.4);*/
-  background: linear-gradient(60deg, #8d8b8b, #807e7e, #a9a5a5, #716e6e) 0 50% ;
+  background: linear-gradient(60deg, #8d8b8b, #807e7e, #a9a5a5, #716e6e) 0 50%;
   box-shadow: 0 0 10px rgba(200, 203, 217, 0.2), 4px 4px 10px rgba(113, 119, 144, 0.2);
   cursor: default;
 }
@@ -754,4 +812,21 @@ export default {
   }
 }
 
+
+.ui.basic.button, .ui.basic.buttons .button {
+  background: transparent none !important;
+  border: 1px solid #9f9494 !important;
+  color: #b0adad !important;
+  font-weight: 400;
+  border-radius: 0.28571429rem;
+  text-transform: none;
+  text-shadow: none !important;
+  box-shadow: 0 0 0 1px rgb(34 36 38 / 15%) inset;
+}
+
+.ui.basic.button:hover {
+  border: 1px solid white !important;
+  color: whitesmoke !important;
+  background: transparent !important;
+}
 </style>
