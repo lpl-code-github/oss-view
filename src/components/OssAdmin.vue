@@ -1,9 +1,11 @@
 <!--对象管理-->
 <template>
   <div class="ossadmin">
-    <Bucket class="bucket" v-if="!objectInfoShow"></Bucket>
+    <Loading v-if="loading"></Loading>
+    <Bucket class="bucket" v-if="!objectInfoShow&&!loading"></Bucket>
 
-    <div class="object" v-if="objectInfoShow">
+    <!--  切换桶的操作  -->
+    <div class="object" v-if="objectInfoShow&&!loading">
       <div style="display: flex;align-items: center;justify-content:space-between;margin: -20px 20px 0px 20px">
         <div style="left:0;text-align: left;font-size: 20px;color:#b0adad;font-weight: bolder">对象管理</div>
         <div class="ui left labeled button" tabindex="0" style="margin-left: 25px;">
@@ -69,13 +71,13 @@
               </div>
 
               <div style="display: flex;align-items: center;justify-content: space-evenly;margin-top: 10px">
-              <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}"><span
+              <span v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '20%':'15%')}" style="color: #b0adad"><span
                   v-if="uploadSliceFlag">分片</span>上传进度：</span>
                 <el-progress v-if="uploadProgressShow" :style="{'width': (uploadSliceFlag? '80%':'85%')}"
                              :text-inside="true"
                              :stroke-width="15"
                              :percentage="progressPercent"></el-progress>
-                <span v-if="hashProgressShow" style="width:20%">上传前准备工作：</span>
+                <span v-if="hashProgressShow" style="width:20%;color: #b0adad">上传前准备工作：</span>
                 <el-progress v-if="hashProgressShow" style="width:80%" :text-inside="true"
                              :stroke-width="15"
                              :percentage="hashProgressPercent"></el-progress>
@@ -116,9 +118,7 @@
         <tr v-for="(item,index) in tableData.Data" :key="index">
           <td>
           <span
-              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{
-              item.Name
-            }}</span>
+              style="max-width: 200px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{item.Name }}</span>
           </td>
           <td class="single line">
             {{ item.Version }}
@@ -165,7 +165,7 @@
       </table>
 
       <!--
-     分页组件
+        分页组件
        1、在列表数据tableData长度为0的时候不显示
        2、约定每页显示5条
        3、总条数total为 tableDataSize
@@ -189,74 +189,75 @@
           title="全部版本"
           :with-header="false"
           :visible.sync="drawer">
-        <p style="text-align: center;margin: 20px;font-size: 16px;color: gray">[ {{ objName }} ] 历史版本</p>
+        <p style="text-align: center;margin: 20px;font-size: 16px;color: #d6d4d4">[ {{ objName }} ] 历史版本</p>
         <!--抽屉中是table组件-->
-        <el-table
-            :data="othersVersion"
-            style="width: 100%">
-          <el-table-column
-              label="版本"
-              width="80">
-            <template slot-scope="scope">
-              <span>{{ scope.row.Version }}</span>
-              <!--紧随其下的div只有在当行中Size=0时才显示 -->
-              <div style="display:inline-block;margin-left: 5px" v-if="scope.row.Size === '0B'">
+        <table class="ui five column selectable inverted table">
+          <thead>
+          <tr>
+            <th class="two wide"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">版本号</font></font>
+            </th>
+            <th class="two wide"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">大小</font></font>
+            </th>
+            <th class="five wide"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">对象散列值</font></font>
+            </th>
+            <th class="two wide" style="text-align: center"><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">操作</font></font>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-if="tableData.Size === 0">
+            <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+              暂无数据
+            </font></font>
+            </td>
+          </tr>
+
+          <tr v-for="(item,index) in othersVersion" :key="index">
+
+            <td class="single line">
+              {{ item.Version }}
+              <div style="display:inline-block;margin-left: 5px" v-if="item.Size === '0B'">
                 <el-tooltip class="item" effect="dark"
                             content="包含此标签代表对象该版本为删除标记，但仍可以查看历史版本"
-                            placement="left-end">
-                  <el-tag size="mini" type="danger">
+                            placement="left-start">
+                  <el-tag size="mini" style="background-color: #7c7b7b;border: #848181;color: #ffffff">
                     <i class="el-icon-delete"></i>
                   </el-tag>
                 </el-tooltip>
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-              label="大小"
-              width="100">
-            <template slot-scope="scope">
-              <span v-if="scope.row.Size != '0B'">{{ scope.row.Size }}</span>
-              <!--紧随其下的span只有在当行中Size=0时才显示 -->
-              <span v-if="scope.row.Size === '0B'"> / </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-              label="散列值">
-            <template slot-scope="scope">
-              <span>{{ scope.row.Hash }}</span>
-              <!--紧随其下的span只有在当行中Size=0时才显示 -->
-              <span v-if="scope.row.Size === '0B'"> / </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-              label="操作"
-              width="150">
-            <template slot-scope="scope">
-              <el-button
+            </td>
+            <td class="single line"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+              {{ (item.Size !== '0B' ? item.Size : '/') }}
+            </font></font>
+            </td>
+
+            <td>
+          <span
+              style="max-width: 400px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
+            </td>
+
+            <td style="display: grid;place-items: center;width: 100%">
+              <el-button :disabled="(item.Size === '0B'? true:false)"
+                         :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
                   class="button el-buttons"
                   size="mini"
-                  @click="handleDownloadOther(scope.$index, scope.row)"
-                  v-if="scope.row.Size !== '0B'">
-                <button class="ui mini teal button" style="margin: 0"><font style="vertical-align: inherit;"><font
+                  @click="handleDownloadOther(index, item)"
+                  >
+                <button class="ui mini teal button" :disabled="(item.Size === '0B'? true:false)"
+                        :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
+                        style="margin: 0"><font style="vertical-align: inherit;"><font
                     style="vertical-align: inherit;">
                   <i class="download icon"></i>下载
                 </font></font></button>
               </el-button>
-              <!--紧随其下的el-button只有在当行中Size=0时才显示，为禁用状态 -->
-              <el-button
-                  class="button el-buttons"
-                  size="mini"
-                  v-if="scope.row.Size === '0B'"
-                  disabled>
-                <button class="ui mini disabled button" style="margin: 0;background-color: #ede9e9;"><font
-                    style="vertical-align: inherit;"><font
-                    style="vertical-align: inherit;">
-                  <i class="download icon"></i>下载
-                </font></font></button>
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </el-drawer>
     </div>
   </div>
@@ -268,12 +269,14 @@ import CryptoJS from 'crypto-js/crypto-js'
 import fileDownload from 'js-file-download';
 import Bucket from "@/components/Bucket";
 import $ from "jquery"
+import Loading from "@/components/Loading";
 
 export default {
   name: 'OssAdmin',
-  components: {Bucket},
+  components: {Loading, Bucket},
   data() {
     return {
+      loading: true,// 默认显示loading
       objectInfoShow: false, // 是否显示对象信息列表
       bucketName: "",//当前桶名称
       objName: "",// 某行操作按钮点击时获取的对象name
@@ -294,21 +297,34 @@ export default {
   // beforeDestroy() {// 实例销毁之前调用
   //   sessionStorage.removeItem("bucketName")
   // },
+  created() {
+  },
   mounted() {
-    // 初始化组件先检查是否有桶名标记
-    if (sessionStorage.getItem("bucketName") === null | sessionStorage.getItem("bucketName") === "") {
-      this.objectInfoShow = false
-    } else {
-      this.bucketName = sessionStorage.getItem("bucketName")
+    //初始化组件
+    this.$request.searchBucket(encodeURI(sessionStorage.getItem("bucketName"))).then(val => {
+      if (val.status !== 200) {
+        sessionStorage.removeItem("bucketName")
+      }
+    }).finally(() => {
       setTimeout(() => {
-        this.objectInfoShow = true
-      }, 0);
-      setTimeout(() => {
-        $('.object').transition('pulse');
-      }, 0);
-    }
-    this.content = "" //加载组件时，搜索框内容为空
-    this.getObjList(this.content, 1) // 默认获取第一页数据
+        this.loading = false
+        // 检查是否有桶名标记
+        if (sessionStorage.getItem("bucketName") === null || sessionStorage.getItem("bucketName") === "") {
+          this.objectInfoShow = false
+        } else {
+          this.bucketName = sessionStorage.getItem("bucketName")
+          setTimeout(() => {
+            this.objectInfoShow = true
+          }, 0);
+          setTimeout(() => {
+            $('.object').transition('pulse');
+          }, 0);
+        }
+        this.content = "" //加载组件时，搜索框内容为空
+        this.getObjList(this.content, 1) // 默认获取第一页数据
+      }, 1000)
+    })
+
   },
   methods: {
     // 切换桶
@@ -363,7 +379,8 @@ export default {
         if (sessionToken === null) { // 如果sessionStorage中没有token
           this.$message.info("文件大小超过50MB，将分片上传，请稍候")
           // 发送分片上传请求
-          this.$request.getSliceUploadToken(param.file.name, hash, param.file.size).then(val => {
+          var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+          this.$request.getSliceUploadToken(param.file.name, hash, param.file.size, bucket).then(val => {
             if (val.status === 201) {  // 201表示token创建成功
               var token = val.headers.location // 保存token
               // 文件切片上传
@@ -386,6 +403,7 @@ export default {
             }
           })
         } else { // 如果有，使用上传失败的token继续上传
+          this.uploadProgressShow = true // 显示进度条
           await this.uploadSlice(param, sessionToken, hash)
         }
       }
@@ -427,7 +445,7 @@ export default {
     // 文件普通上传
     uploadObj(param, hash, uploadProgressEvent) {
       var bucket = encodeURI(sessionStorage.getItem("bucketName"))
-      this.$request.uploadObj(param.file.name, param.file, hash,bucket, uploadProgressEvent).then(val => {
+      this.$request.uploadObj(param.file.name, param.file, hash, bucket, uploadProgressEvent).then(val => {
         if (val.status === 200) {
           this.$message.success("上传成功")
         } else {
@@ -460,9 +478,9 @@ export default {
       // 文件分片
       var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice; // 兼容方式获取slice方法
       var chunk_file = blobSlice.call(param.file, start, end);
-
+      var bucket = encodeURI()
       // 发送上传请求
-      this.$request.uploadSlice(token, chunk_file, range).then(val => {
+      this.$request.uploadSlice(token, chunk_file, range, bucket).then(val => {
         if (val.status === 200) {
           this.progressPercent = Math.floor((100 / param.file.size) * start)
           if (lastSlice) { // 最后一个分片上传成功
@@ -505,7 +523,8 @@ export default {
 
     // 下载对象最新版本
     handleDownload(index, row) {
-      this.$request.getObj(row.Name).then(val => {
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+      this.$request.getObj(row.Name, bucket).then(val => {
         console.log(val)
         if (val.status == 200) {
           fileDownload(val.data, row.Name);
@@ -517,7 +536,8 @@ export default {
 
     // 下载对象其它版本
     handleDownloadOther(index, row) {
-      this.$request.getObj(this.objName + "?version=" + row.Version).then(val => {
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+      this.$request.getObj(this.objName + "?version=" + row.Version, bucket).then(val => {
         if (val.status == 200) {
           fileDownload(val.data, row.Name);
         } else {
@@ -530,7 +550,8 @@ export default {
     handAll(index, row) {
       this.othersVersion = []
       this.objName = row.Name
-      this.$request.getObjOtherLists(row.Name).then(val => {
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+      this.$request.getObjOtherLists(row.Name, bucket).then(val => {
         if (val.status == 200) {
           for (let valKey in val.data) {
             val.data[valKey].Size = this.conver(val.data[valKey].Size)
@@ -553,7 +574,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => { //如果点击确定
-        this.$request.deleteObj(row.Name).then(val => {
+        var bucket = encodeURI(sessionStorage.getItem("bucketName"))
+        this.$request.deleteObj(row.Name, bucket).then(val => {
           if (val.status == 200) {
             this.$message.success("删除成功")
           } else {
@@ -616,7 +638,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 
 .ossadmin {
   width: 100%;
@@ -643,11 +665,13 @@ export default {
   z-index: 1;
   margin: 0 auto;
 }
-.ui.placeholder.segment{
+
+.ui.placeholder.segment {
   background-color: transparent;
   box-shadow: none;
   border: 0px;
 }
+
 .upload-demo::after {
   position: absolute;
   content: "";
@@ -828,5 +852,15 @@ export default {
   border: 1px solid white !important;
   color: whitesmoke !important;
   background: transparent !important;
+}
+
+.el-drawer__body {
+  background-color: #2c2c2c;
+}
+.ui.table thead tr:first-child>th:first-child {
+  border-radius: 0;
+}
+.ui.table thead tr:first-child>th:last-child {
+  border-radius: 0;
 }
 </style>
