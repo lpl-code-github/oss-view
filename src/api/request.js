@@ -13,13 +13,29 @@ export const getNodeSystemInfo = (params) => {
         .then(res => res)
 }
 // 获取桶列表
-export const getBucketList = params => {
+export const getBucketList = (params,bucket) => {
     return service
-        .get('/bucket/' + params)
+        .request({
+            url: '/bucket/' + params,
+            method: 'GET',
+            headers: {
+                'bucket': bucket
+            },
+        })
         .then(res => res)
 }
-
-
+// head查询桶是否存在
+export const searchBucket = params => {
+    return service
+        .request({
+            url: '/bucket/',
+            method: 'head',
+            headers: {
+                'bucket': params
+            },
+        })
+        .then(res => res)
+}
 // 新增桶
 export const addBucket = params => {
     return service
@@ -32,7 +48,6 @@ export const addBucket = params => {
         })
         .then(res => res)
 }
-
 // 对象最新版本分页列表api
 export const getObjLists = (params, bucket) => {
     return service
@@ -48,19 +63,30 @@ export const getObjLists = (params, bucket) => {
 }
 
 // 单个对象其它版本列表api
-export const getObjOtherLists = params => {
+export const getObjOtherLists = (params, bucket) => {
     return service
-        .get('/versions/' + params)
+        .request({
+            url: '/versions/' + params,
+            method: 'GET',
+            headers: {
+                'bucket': bucket
+            },
+        })
         .then(res => res)
 }
-
 // 下载对象api
-export const getObj = params => {
+export const getObj = (params, bucket) => {
     return service
-        .get('/objects/' + params, {responseType: 'blob'})
+        .request({
+            url: '/objects/' + params,
+            method: 'GET',
+            responseType: 'blob',
+            headers: {
+                'bucket': bucket
+            },
+        })
         .then(res => res)
 }
-
 // 普通上传api
 export const uploadObj = (params, data, hash, bucket, onUploadProgress) => {
     return service
@@ -78,14 +104,15 @@ export const uploadObj = (params, data, hash, bucket, onUploadProgress) => {
 }
 
 // 分片请求 获取token api
-export const getSliceUploadToken = (params, hash, size) => {
+export const getSliceUploadToken = (params, hash, size,bucket) => {
     return service
         .request({
             url: '/objects/' + params,
             method: 'POST',
             headers: {
                 'Digest': 'SHA-256=' + hash,
-                'Size': size
+                'Size': size,
+                'bucket': bucket
             }
         })
         .then(res => res)
@@ -97,27 +124,32 @@ export const headUploadSliceProgress = (params) => {
         .then(res => res)
 }
 
-
 // 分片上传对象api
-export const uploadSlice = (params, data, range, onUploadProgress) => {
+export const uploadSlice = (params, data, range,bucket) => {
     return service
         .request({
             url: params,
             method: 'put',
             data: data,
             headers: {
-                'range': range
-            },
-            onUploadProgress
+                'range': range,
+                'bucket':bucket
+            }
         })
         .then(res => res)
 }
 
 
 // 删除对象api
-export const deleteObj = (params) => {
+export const deleteObj = (params,bucket) => {
     return service
-        .delete('/objects/' + params)
+        .request({
+            url: '/objects/' + params,
+            method: 'delete',
+            headers: {
+                'bucket':bucket
+            }
+        })
         .then(res => res)
 }
 
