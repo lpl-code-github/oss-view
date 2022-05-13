@@ -54,8 +54,8 @@
     <el-dialog :visible.sync="dialogTableVisible" width="90%" @close='closeDialog'>
       <span></span>
       <span></span>
-      <span></span>
-      <span></span>
+
+
 
 
       <h2 style="margin-top: -30px;margin-bottom: 20px;text-align: center">{{ title }}</h2>
@@ -510,7 +510,6 @@ export default {
 .overview {
   width: 100%;
   height: 100%;
-  //position: relative;
 
   .el-dialog {
     text-align: left;
@@ -526,8 +525,6 @@ export default {
     box-shadow: 0 20px 50px rgb(23, 32, 90);
     border: 2px solid #2a3cad;
     color: white;
-    //padding: 20px;
-
   }
 
   .text {
@@ -552,15 +549,6 @@ export default {
   }
 
   .el-dialog span:nth-child(2) {
-    transform: rotate(90deg);
-    position: absolute;
-    top: 0;
-    left: 36.56%;
-    width: 100%;
-    height: 100%;
-  }
-
-  .el-dialog span:nth-child(3) {
     transform: rotate(180deg);
     position: absolute;
     top: 0;
@@ -569,32 +557,14 @@ export default {
     height: 100%;
   }
 
-  .el-dialog span:nth-child(4) {
-    transform: rotate(270deg);
-    position: absolute;
-    top: 0;
-    right: 36.55%;
-    width: 100%;
-    height: 100%;
-  }
-
-  .el-dialog span:before {
+  .el-dialog span:nth-child(1):before, span:nth-child(2):before {
     content: '';
     position: absolute;
     width: 100%;
     height: 2px;
     background: #50dfdb;
-
-  }
-
-  .el-dialog span:nth-child(1):before, span:nth-child(3):before {
     animation: animate 5s linear infinite;
   }
-
-  .el-dialog span:nth-child(2):before, span:nth-child(4):before {
-    animation: animate 5s linear infinite;
-  }
-
 
   @keyframes animate {
     0% {
