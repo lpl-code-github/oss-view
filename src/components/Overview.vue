@@ -46,7 +46,6 @@
                 style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看</font></font></button>
           </font></font></td>
         </tr>
-
         </tbody>
       </table>
     </div>
@@ -54,9 +53,6 @@
     <el-dialog :visible.sync="dialogTableVisible" width="90%" @close='closeDialog'>
       <span></span>
       <span></span>
-
-
-
 
       <h2 style="margin-top: -30px;margin-bottom: 20px;text-align: center">{{ title }}</h2>
 
@@ -76,7 +72,6 @@
           </font></font></div>
 
         </div>
-
 
         <!--CPU信息-->
         <div class="statistic">
@@ -159,7 +154,6 @@
           <span></span>
         </div>
       </div>
-
     </el-dialog>
   </div>
 </template>
@@ -337,7 +331,6 @@ export default {
         this.myChart.dispose();
       }
       this.myChart = this.$echarts.init(document.getElementById('main'));
-      // window.onresize = this.myChart.resize
 
       this.myChart.setOption({
         //animation:false,// 取消动画
