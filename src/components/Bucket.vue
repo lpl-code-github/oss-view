@@ -29,7 +29,7 @@
                 <div class="ui  search">
                   <div class="ui icon input">
                     <!--搜索输入框-->
-                    <input class="prompt" type="text"
+                    <input v-model.trim="searchContent" @input="getBucket(searchContent,1)" class="prompt" type="text"
                            placeholder="Input Bucket Name">
                     <i class="search icon"></i>
                   </div>
@@ -122,7 +122,8 @@
         </div>
 
         <div id="container" style="margin-top: 20px">
-          <button class="learn-more" @click="toOssAdmin">
+          <button class="learn-more" @click="toOssAdmin" :disabled="bucketData.length===0"
+                  :style="(bucketData.length===0 ? 'opacity: 0.6;cursor:not-allowed;':'')">
               <span class="circle" aria-hidden="true">
                 <span class="icon arrow"></span>
               </span>
@@ -146,16 +147,14 @@
 </template>
 
 <script>
-import $ from "jquery"
-
 export default {
   name: "Bucket",
   inject: ['reload'],
   data() {
     return {
       bucketDataSize: 0,// 数据总条数 ，分页组件使用
-      bucketData: {},// 桶数据列表
-      search: "", // 搜索框
+      bucketData: [],// 桶数据列表
+      searchContent: "", // 搜索框
       bucketName: "",// 新增输入框
       radio: "" // 复选框选中数据值
     }
@@ -163,7 +162,8 @@ export default {
   mounted() {
   },
   created() {
-    this.getBucket(1)
+    this.searchContent = ""
+    this.getBucket(this.searchContent, 1)
   },
   methods: {
     // 切换复选框的操作
@@ -176,12 +176,18 @@ export default {
       sessionStorage.setItem("bucketName", this.radio)
       this.reload();
     },
+
     // 获取桶列表
-    getBucket(index) {
-      this.$request.getBucketList(index).then(val => {
+    getBucket(name, index) {
+      this.$request.getBucketList(index, encodeURI(name)).then(val => {
         if (val.status === 200) {
-          this.bucketDataSize = val.data.size
-          this.bucketData = val.data.data;
+          if (val.data.size !== 0) {
+            this.bucketDataSize = val.data.size
+            this.bucketData = val.data.data;
+          } else {
+            this.bucketDataSize = 0
+            this.bucketData = [];
+          }
         } else {
           this.$message.error("获取桶列表失败")
         }
@@ -191,7 +197,7 @@ export default {
     },
     //分页切换函数
     handleCurrentChange(val) {    //分页的点击函数current-change，在currentPage 改变时会触发
-      this.getBucket(val)
+      this.getBucket(this.searchContent, val)
     },
     // 新增桶
     addBucket(bucketName) {
@@ -208,10 +214,9 @@ export default {
         }
       }).finally(() => {
         this.bucketName = ""
-        this.getBucket(1)
+        this.getBucket(this.searchContent, 1)
       })
     },
-
   }
 }
 </script>
