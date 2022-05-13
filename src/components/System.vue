@@ -1,155 +1,125 @@
 <!--系统管理-->
 <template>
   <div style="width: 100%">
-    <!--系统概览 对象存储数量，上传请求次数，维护次数-->
-    <div class="ui four statistics">
-      <div class="statistic">
-        <h2 class="ui small center aligned icon header">
-          <i class="blue hdd icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          <div class="wrapper-header">
-            <span>系</span>
-            <span>统</span>
-            <span>概</span>
-            <span>览</span>
-          </div>
-        </font></font></h2>
-      </div>
-      <div class="brown statistic">
-        <div class="value"><font style="vertical-align: inherit;">
-          <i class="small archive icon"></i> <font style="vertical-align: inherit;">
-          {{ systemInfo.Obj }}
-        </font></font></div>
-        <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          存储对象数量/个
-        </font></font></div>
-      </div>
-      <div class="teal statistic">
-        <div class="value"><font style="vertical-align: inherit;">
-          <i class="small upload icon"></i>
-          <font style="vertical-align: inherit;">
-            {{ systemInfo.Put }}</font></font></div>
-        <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          上传请求次数/次
-        </font></font></div>
-      </div>
-      <div class="orange statistic">
-        <div class="value">
-          <i class="small sync alternate icon"></i> <font style="vertical-align: inherit;"><font
-            style="vertical-align: inherit;">{{ systemInfo.Uphold }}
-        </font></font></div>
-        <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-          维护次数/次
-        </font></font></div>
-      </div>
-    </div>
-    <!-- 日历热力图 -->
-    <div id="main" :style="styles"></div>
-    <div class="ui section divider"></div>
-
-    <!-- 系统维护按钮 -->
-    <div>
-      <div class="ui four statistics" style="width: auto">
-        <div class="statistic" style="margin-top: 140px">
-          <h2 class="ui small center aligned icon header text">
-            <i class="blue settings icon"></i><font style="vertical-align: inherit;"><font
-              style="vertical-align: inherit;">
+      <!--系统概览 对象存储数量，上传请求次数，维护次数-->
+      <div class="ui four statistics">
+        <div class="statistic">
+          <h2 class="ui small center aligned icon header">
+            <i class="blue hdd icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
             <div class="wrapper-header">
               <span>系</span>
               <span>统</span>
-              <span>维</span>
-              <span>护</span>
+              <span>概</span>
+              <span>览</span>
             </div>
-          </font></font>
-          </h2>
-
-          <!-- 紧随其下的div，只有在loading为true的时候才会上显示 -->
-          <div class="autumn ui icon message" v-if="loading">
-            <i class="notched circle loading icon"></i>
-            <div class="content">
-              <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-                只需一小会，请不要刷新页面
-              </font></font></div>
-              <p><font style="vertical-align: inherit;"><font
-                  style="vertical-align: inherit;">正在进行{{ operation }}的操作...</font></font>
-              </p>
-            </div>
-          </div>
-
-          <!-- 紧随其下的div，只有在complete为true的时候才会上显示 -->
-          <div class="autumn ui icon message" v-if="complete">
-            <i class="notched green check circle outline icon"></i>
-            <div class="content" style="margin-right: 40px ">
-              <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-                {{ operation }}已完成
-              </font></font></div>
-            </div>
-          </div>
-
-          <!-- 紧随其下的div，只有在error为true的时候才会上显示 -->
-          <div class="autumn ui icon message" v-if="error">
-            <i class="notched green x icon"></i>
-            <div class="content" style="margin-right: 40px ">
-              <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-                {{ operation }} 发生错误
-              </font></font></div>
-            </div>
-          </div>
+          </font></font></h2>
         </div>
+        <div class="brown statistic">
+          <div class="value"><font style="vertical-align: inherit;">
+            <i class="small archive icon"></i> <font style="vertical-align: inherit;">
+            {{ systemInfo.Obj }}
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            存储对象数量/个
+          </font></font></div>
+        </div>
+        <div class="teal statistic">
+          <div class="value"><font style="vertical-align: inherit;">
+            <i class="small upload icon"></i>
+            <font style="vertical-align: inherit;">
+              {{ systemInfo.Put }}</font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            上传请求次数/次
+          </font></font></div>
+        </div>
+        <div class="orange statistic">
+          <div class="value">
+            <i class="small sync alternate icon"></i> <font style="vertical-align: inherit;"><font
+              style="vertical-align: inherit;">{{ systemInfo.Uphold }}
+          </font></font></div>
+          <div class="label"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            维护次数/次
+          </font></font></div>
+        </div>
+      </div>
+      <!-- 日历热力图 -->
+      <div id="main" :style="styles"></div>
+      <div class="ui section divider"></div>
 
-        <div style="margin:25px 20px 0px 150px;text-align: left;">
-          <div class="ui divided items" style="width: 100%">
-            <div class="item">
-              <div style="width:100px">
-                <i class="huge grey map icon"></i>
+      <!-- 系统维护按钮 -->
+      <div>
+        <div class="ui four statistics" style="width: auto">
+          <div class="statistic" style="margin-top: 140px">
+            <h2 class="ui small center aligned icon header text">
+              <i class="blue settings icon"></i><font style="vertical-align: inherit;"><font
+                style="vertical-align: inherit;">
+              <div class="wrapper-header">
+                <span>系</span>
+                <span>统</span>
+                <span>维</span>
+                <span>护</span>
               </div>
+            </font></font>
+            </h2>
+
+            <!-- 紧随其下的div，只有在loading为true的时候才会上显示 -->
+            <div class="autumn ui icon message" v-if="loading">
+              <i class="notched circle loading icon"></i>
               <div class="content">
-                <a class="header label"><font style="vertical-align: inherit;"><font
-                    style="vertical-align: inherit;">选择对象保留版本数量</font></font></a>
-                <div class="meta text">
-                  <span class="cinema"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这个操作将所有对象从最新版本起，保留n个版本的元数据</font></font></span>
-                </div>
-                <div class="description">
-                  <p></p>
-                </div>
-                <div class="extra">
-                  <el-popconfirm
-                      @confirm="deleteOldMetadata"
-                      cancel-button-text="再考虑一下"
-                      title="您是否已经知晓该操作带来的影响并执行？">
-                    <div class="ui right floated primary  button" slot="reference"><font
-                        style="vertical-align: inherit;"><font
-                        style="vertical-align: inherit;">
-                      保留版本
-                    </font></font><i class="right chevron icon"></i>
-                    </div>
-                  </el-popconfirm>
-                </div>
+                <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+                  只需一小会，请不要刷新页面
+                </font></font></div>
+                <p><font style="vertical-align: inherit;"><font
+                    style="vertical-align: inherit;">正在进行{{ operation }}的操作...</font></font>
+                </p>
               </div>
             </div>
-            <div class="ui divided items">
+
+            <!-- 紧随其下的div，只有在complete为true的时候才会上显示 -->
+            <div class="autumn ui icon message" v-if="complete">
+              <i class="notched green check circle outline icon"></i>
+              <div class="content" style="margin-right: 40px ">
+                <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+                  {{ operation }}已完成
+                </font></font></div>
+              </div>
+            </div>
+
+            <!-- 紧随其下的div，只有在error为true的时候才会上显示 -->
+            <div class="autumn ui icon message" v-if="error">
+              <i class="notched red x icon"></i>
+              <div class="content" style="margin-right: 40px ">
+                <div class="header"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+                  {{ operation }} 发生错误
+                </font></font></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin:25px 20px 0px 150px;text-align: left;">
+            <div class="ui divided items" style="width: 100%">
               <div class="item">
                 <div style="width:100px">
-                  <i class="huge grey trash icon"></i>
+                  <i class="huge grey map icon"></i>
                 </div>
                 <div class="content">
                   <a class="header label"><font style="vertical-align: inherit;"><font
-                      style="vertical-align: inherit;">删除无元数据引用的文件</font></font></a>
-                  <div class="meta">
-                    <span class="cinema text"><font style="vertical-align: inherit;"><font
-                        style="vertical-align: inherit;">这个操作将无元数据引用的对象文件移动至垃圾目录，受上个操作的影响</font></font></span>
+                      style="vertical-align: inherit;">选择对象保留版本数量</font></font></a>
+                  <div class="meta text">
+                    <span class="cinema"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这个操作将所有对象从最新版本起，保留n个版本的元数据</font></font></span>
                   </div>
                   <div class="description">
                     <p></p>
                   </div>
                   <div class="extra">
                     <el-popconfirm
-                        @confirm="deleteOrphan"
+                        @confirm="deleteOldMetadata"
                         cancel-button-text="再考虑一下"
                         title="您是否已经知晓该操作带来的影响并执行？">
-                      <div class="ui right floated primary button" slot="reference"><font
+                      <div class="ui right floated primary  button" slot="reference"><font
                           style="vertical-align: inherit;"><font
                           style="vertical-align: inherit;">
-                        删除数据
+                        保留版本
                       </font></font><i class="right chevron icon"></i>
                       </div>
                     </el-popconfirm>
@@ -159,30 +129,61 @@
               <div class="ui divided items">
                 <div class="item">
                   <div style="width:100px">
-                    <i class="huge grey  wrench icon"></i>
+                    <i class="huge grey trash icon"></i>
                   </div>
                   <div class="content">
                     <a class="header label"><font style="vertical-align: inherit;"><font
-                        style="vertical-align: inherit;">对象数据的检查和修复</font></font></a>
-                    <div class="meta text">
-                      <span class="cinema"><font style="vertical-align: inherit;"><font
-                          style="vertical-align: inherit;">这个操作将全盘扫描，对可修复的对象文件进行修复操作</font></font></span>
+                        style="vertical-align: inherit;">删除无元数据引用的文件</font></font></a>
+                    <div class="meta">
+                    <span class="cinema text"><font style="vertical-align: inherit;"><font
+                        style="vertical-align: inherit;">这个操作将无元数据引用的对象文件移动至垃圾目录，受上个操作的影响</font></font></span>
                     </div>
                     <div class="description">
                       <p></p>
                     </div>
                     <div class="extra">
                       <el-popconfirm
-                          @confirm="objectScanner"
+                          @confirm="deleteOrphan"
                           cancel-button-text="再考虑一下"
                           title="您是否已经知晓该操作带来的影响并执行？">
                         <div class="ui right floated primary button" slot="reference"><font
                             style="vertical-align: inherit;"><font
                             style="vertical-align: inherit;">
-                          全盘修复
+                          删除数据
                         </font></font><i class="right chevron icon"></i>
                         </div>
                       </el-popconfirm>
+                    </div>
+                  </div>
+                </div>
+                <div class="ui divided items">
+                  <div class="item">
+                    <div style="width:100px">
+                      <i class="huge grey  wrench icon"></i>
+                    </div>
+                    <div class="content">
+                      <a class="header label"><font style="vertical-align: inherit;"><font
+                          style="vertical-align: inherit;">对象数据的检查和修复</font></font></a>
+                      <div class="meta text">
+                      <span class="cinema"><font style="vertical-align: inherit;"><font
+                          style="vertical-align: inherit;">这个操作将全盘扫描，对可修复的对象文件进行修复操作</font></font></span>
+                      </div>
+                      <div class="description">
+                        <p></p>
+                      </div>
+                      <div class="extra">
+                        <el-popconfirm
+                            @confirm="objectScanner"
+                            cancel-button-text="再考虑一下"
+                            title="您是否已经知晓该操作带来的影响并执行？">
+                          <div class="ui right floated primary button" slot="reference"><font
+                              style="vertical-align: inherit;"><font
+                              style="vertical-align: inherit;">
+                            全盘修复
+                          </font></font><i class="right chevron icon"></i>
+                          </div>
+                        </el-popconfirm>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -191,67 +192,63 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <div style="width: 90%;margin: 50px 0px 0px 80px"></div>
+      <div style="width: 90%;margin: 50px 0px 0px 80px"></div>
 
-    <!--系统维护列表-->
-    <div class="ui section divider"></div>
-    <div style="text-align: left;margin-left: 120px">
-      <!--      <h3 class="ui header text"><font style="vertical-align: inherit;"><font-->
-      <!--          style="vertical-align: inherit;">历史维护列表</font></font></h3>-->
-      <div class="wrapper-header">
-        <span>历</span>
-        <span>史</span>
-        <span>维</span>
-        <span>护</span>
-        <span>列</span>
-        <span>表</span>
+      <!--系统维护列表-->
+      <div class="ui section divider"></div>
+      <div style="text-align: left;margin-left: 120px">
+        <!--      <h3 class="ui header text"><font style="vertical-align: inherit;"><font-->
+        <!--          style="vertical-align: inherit;">历史维护列表</font></font></h3>-->
+        <div class="wrapper-header">
+          <span>历</span>
+          <span>史</span>
+          <span>维</span>
+          <span>护</span>
+          <span>列</span>
+          <span>表</span>
+        </div>
       </div>
-    </div>
 
-    <div class="block" style="text-align: left;margin-left: 80px;margin-top: 50px;width: 85%">
-      <div v-if="operationSize===0" class="wrapper">
-        <span>暂</span>
-        <span>无</span>
-        <span>数</span>
-        <span>据</span>
+      <div class="block" style="text-align: left;margin-left: 80px;margin-top: 50px;width: 85%">
+        <div v-if="operationSize===0" class="wrapper">
+          <span>暂</span>
+          <span>无</span>
+          <span>数</span>
+          <span>据</span>
+        </div>
+        <el-timeline  style="background-color: transparent;margin-left: 50px">
+          <el-timeline-item color="#2185d0" :timestamp="operation.Date" placement="top"
+                            v-for="(operation,i) in operationData" :key="i" >
+            <el-card style="background-color: transparent;border: 0px solid transparent;box-shadow:none;">
+              <el-timeline :reverse="reverse" v-for="(activity, index) in operation.Data" :key="index">
+                <el-timeline-item
+                    icon="el-icon-s-tools"
+                    placement="top"
+                    color='transparent'
+                    size='large'
+                    style="margin-left: -50px!important;"
+                    :timestamp="activity.Time">
+                  <span style="color:#f9f9f9;">{{ activity.Operation }}</span>
+                </el-timeline-item>
+              </el-timeline>
+            </el-card>
+          </el-timeline-item>
+
+        </el-timeline>
       </div>
-      <el-timeline  style="background-color: transparent;margin-left: 50px">
-        <el-timeline-item color="#2185d0" :timestamp="operation.Date" placement="top"
-                          v-for="(operation,i) in operationData" :key="i" >
-          <el-card style="background-color: transparent;border: 0px solid transparent;box-shadow:none;">
-            <el-timeline :reverse="reverse" v-for="(activity, index) in operation.Data" :key="index">
-              <el-timeline-item
-                  icon="el-icon-s-tools"
-                  placement="top"
-                  color='transparent'
-                  size='large'
-                  style="margin-left: -50px!important;"
-                  :timestamp="activity.Time">
-                <span style="color:#f9f9f9;">{{ activity.Operation }}</span>
-              </el-timeline-item>
-            </el-timeline>
-          </el-card>
-        </el-timeline-item>
-
-      </el-timeline>
+      <!-- 分页组件 -->
+      <el-pagination
+          v-if="operationSize!==0"
+          :page-size="5"
+          :pager-count="11"
+          background
+          :current-page="1"
+          @current-change="handleCurrentChange"
+          layout="prev, pager, next"
+          :total="operationSize">
+      </el-pagination>
     </div>
-    <!-- 分页组件 -->
-    <el-pagination
-        v-if="operationSize!==0"
-        :page-size="5"
-        :pager-count="11"
-        background
-        :current-page="1"
-        @current-change="handleCurrentChange"
-        layout="prev, pager, next"
-        :total="operationSize">
-    </el-pagination>
-    <!--    <el-empty v-if="operationSize===0" image="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" :image-size="200"></el-empty>-->
-
-
-  </div>
 </template>
 
 <script>
@@ -490,7 +487,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 .text {
   color: #b0adad !important;
 }
@@ -498,6 +494,4 @@ export default {
 .label {
   color: #d8cccc !important;
 }
-
-
 </style>
