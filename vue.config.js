@@ -10,7 +10,7 @@ module.exports = {
     devServer: {
         disableHostCheck: true,
         host: 'lploss.cn',
-        port: 9000,
+        port: 9999,
         proxy: {
             '/apis': {
                 target: 'http://localhost:9000',// 要跨域的域名
