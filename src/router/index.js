@@ -17,7 +17,8 @@ const routes = [
         children:[
             {path: '/overview', component: () => import('@/components/Overview')},
             {path: '/ossAdmin', component: () => import('@/components/OssAdmin')},
-            {path: '/system', component: () => import('@/components/System')}
+            {path: '/system', component: () => import('@/components/System')},
+            {path: '/log', component: () => import('@/components/Log')}
         ]
     },
     {
