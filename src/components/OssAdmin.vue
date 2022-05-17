@@ -315,13 +315,13 @@ export default {
           this.bucketName = sessionStorage.getItem("bucketName")
           setTimeout(() => {
             this.objectInfoShow = true
+            this.content = "" //加载组件时，搜索框内容为空
+            this.getObjList(this.content, 1) // 默认获取第一页数据
           }, 0);
           setTimeout(() => {
             $('.object').transition('pulse');
           }, 0);
         }
-        this.content = "" //加载组件时，搜索框内容为空
-        this.getObjList(this.content, 1) // 默认获取第一页数据
       }, 1000)
     })
 
