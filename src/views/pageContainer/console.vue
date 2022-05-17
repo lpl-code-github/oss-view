@@ -30,6 +30,9 @@
               <li>
                 <router-link id="system" to="/system">系统维护</router-link>
               </li>
+              <li>
+                <router-link id="log" to="/log">日志管理</router-link>
+              </li>
             </ul>
           </nav>
         </headers>
