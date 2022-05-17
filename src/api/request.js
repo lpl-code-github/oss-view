@@ -181,3 +181,13 @@ export const deleteOldMetadata = (params) => {
         .then(res => res)
 }
 
+// 全部日志
+export const getLog = (params,data) => {
+    return service
+        .request({
+            url: "/getLog/"+params,
+            method: 'post',
+            data: data
+        })
+        .then(res => res)
+}
