@@ -21,17 +21,8 @@
         <headers>
           <nav>
             <ul>
-              <li>
-                <router-link id="overview" to="/overview" class="active">节点监控</router-link>
-              </li>
-              <li>
-                <router-link id="ossAdmin" to="/ossAdmin">桶/对象管理</router-link>
-              </li>
-              <li>
-                <router-link id="system" to="/system">系统维护</router-link>
-              </li>
-              <li>
-                <router-link id="log" to="/log">日志管理</router-link>
+              <li v-for="(item,index) in tabsList" @click="onAddClass(index)" >
+                <router-link id="overview" :to="item.to" :class="{'active':index === orderNum}">{{item.name}}</router-link>
               </li>
             </ul>
           </nav>
@@ -75,13 +66,20 @@ export default {
   },
   data() {
     return {
-      isRouterAlive: true   //控制视图是否显示的变量
+      isRouterAlive: true,   //控制视图是否显示的变量
+      tabsList: [ // tab切换按钮选项
+        {name: '节点监控', num: 0, to: "/overview"},
+        {name: '桶/对象管理', num: 1, to: "/ossAdmin"},
+        {name: '系统维护', num: 2, to: "/system"},
+        {name: '日志管理', num: 3, to: "/log"}
+      ],
+      orderNum:0
     }
   },
   computed: {},
   watch: {},
   methods: {
-    reload () {
+    reload() {
       this.isRouterAlive = false;   //先关闭，
       this.$nextTick(function () {
         this.isRouterAlive = true;  //再打开
@@ -89,21 +87,21 @@ export default {
     },
     toHome() {
       this.$router.push("/")
+    },
+    onAddClass(i){
+      this.orderNum = i;
     }
   },
   created() {
   },
 
   mounted() {
-    var nav = $('nav');
-    nav.find('.active').removeClass('active');
-    var path = "#" + this.$route.path.toString().replace("/", "")
-    $(path).addClass("active")
-    // 切换路由
-    nav.delegate('a', 'click', function (e) {
-      nav.find('.active').removeClass('active');
-      $(e.target).closest('a').addClass('active');
-    })
+    // 路由与导航列表匹配则高亮
+    for (const index in this.tabsList) {
+      if (this.tabsList[index].to === this.$route.path.toString()){
+        this.orderNum= this.tabsList[index].num
+      }
+    }
   }
 }
 </script>
