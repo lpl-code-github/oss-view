@@ -14,6 +14,7 @@
               </button>
             </span>
               <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="">全部</el-dropdown-item>
                 <el-dropdown-item command="TRACE">TRACE</el-dropdown-item>
                 <el-dropdown-item command="INFO">INFO</el-dropdown-item>
                 <el-dropdown-item command="WARN">WARN</el-dropdown-item>
@@ -37,7 +38,7 @@
                   style="width: 100%"
                   v-model="dataTimeValue"
                   type="datetimerange"
-
+                  :default-time="['00:00:00', '23:59:00']"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期">
               </el-date-picker>
@@ -61,8 +62,7 @@
         <tr>
           <th class="three wide">机器</th>
           <th class="one wide">级别</th>
-          <th class="two wide">日期</th>
-          <th class="two wide">时间</th>
+          <th class="three wide">时间</th>
           <th class="ten wide">内容</th>
         </tr>
         </thead>
@@ -72,31 +72,26 @@
             {{ item.osName }}
           </td>
           <td>
-            <a v-if="item.level==='Info'" class="ui blue label"><font style="vertical-align: inherit;"><font
+            <a v-if="item.level==='INFO'" class="ui blue label"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">{{ item.level }}</font></font></a>
-            <a v-if="item.level==='Error'" class="ui red label"><font style="vertical-align: inherit;"><font
+            <a v-if="item.level==='ERROR'" class="ui red label"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">{{ item.level }}</font></font></a>
-            <a v-if="item.level==='Warn'" class="ui orange label"><font style="vertical-align: inherit;"><font
+            <a v-if="item.level==='WARN'" class="ui orange label"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">{{ item.level }}</font></font></a>
-            <a v-if="item.level==='Trace'" class="ui black label"><font style="vertical-align: inherit;"><font
+            <a v-if="item.level==='TRACE'" class="ui black label"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">{{ item.level }}</font></font></a>
           </td>
           <td>
-            {{ item.date }}
-          </td>
-          <td>
-            {{ item.time }}
+            {{ item.dateTime |dateFilter("yyy-mm-dd hh:mm:ss") }}
           </td>
           <td>
             {{ item.content }}
           </td>
         </tr>
-
         </tbody>
         <tfoot>
-
         <tr>
-          <th colspan="5">
+          <th colspan="4">
             显示20条
           </th>
         </tr>
@@ -170,14 +165,27 @@ export default {
       }
       if (this.dataTimeValue.length !== 0) {
         var dateTime = {
-          "from": this.dateFormat(this.dataTimeValue[0]),
-          "to": this.dateFormat(this.dataTimeValue[1])
+          "from": Math.trunc(this.dataTimeValue[0].getTime() / 1000),
+          "to": Math.trunc(this.dataTimeValue[1].getTime()/ 1000)
         }
         paramData["dateTime"] = dateTime
       }
       return paramData
     },
-    dateFormat(date) {
+    async getLog(index) {
+      // 拼接参数
+      this.logData = []
+      var data = await this.splitParam();
+      this.$request.getLog(index, data).then(value => {
+        this.logDataSize = value.data.size
+        this.logData = value.data.data
+      })
+    },
+  },
+  // 日期格式化
+  filters: {
+    dateFilter: function (value) {
+      var date = new Date(value * 1000);
       var year = date.getFullYear();
       /* 在日期格式中，月份是从0开始，11结束，因此要加0
        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
@@ -189,19 +197,7 @@ export default {
       var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
       // 拼接
       return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
-    },
-    async getLog(index) {
-      // 拼接参数
-      this.logData = []
-      var data = await this.splitParam();
-      this.$request.getLog(index, data).then(value => {
-        this.logDataSize = value.data.size
-        this.logData = value.data.data
-
-        // console.log(value.data)
-      })
     }
-
   }
 }
 </script>
