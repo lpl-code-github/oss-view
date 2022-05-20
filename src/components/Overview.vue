@@ -550,13 +550,15 @@ export default {
     height: 100%;
   }
 
-  .el-dialog span:nth-child(1):before, span:nth-child(2):before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background: #50dfdb;
-    animation: animate 5s linear infinite;
+  .el-dialog {
+    span:nth-child(1):before, span:nth-child(2):before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: #50dfdb;
+      animation: animate 5s linear infinite;
+    }
   }
 
   @keyframes animate {
