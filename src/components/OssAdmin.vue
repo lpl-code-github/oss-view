@@ -243,10 +243,10 @@
             <td style="display: grid;place-items: center;width: 100%">
               <el-button :disabled="(item.Size === '0B'? true:false)"
                          :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
-                  class="button el-buttons"
-                  size="mini"
-                  @click="handleDownloadOther(index, item)"
-                  >
+                         class="button el-buttons"
+                         size="mini"
+                         @click="handleDownloadOther(index, item)"
+              >
                 <button class="ui mini teal button" :disabled="(item.Size === '0B'? true:false)"
                         :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
                         style="margin: 0"><font style="vertical-align: inherit;"><font
@@ -292,6 +292,7 @@ export default {
       // bytesPerPiece: 32000, // 约定每个切片的长度
       hashProgressPercent: 0,//计算hash进度
       notification: null,// 计算hash消息通知默认不关闭
+      hash:""// hash值
     }
   },
   // beforeDestroy() {// 实例销毁之前调用
@@ -354,8 +355,8 @@ export default {
       }
 
       // 获取对象hash值的base64编码值
-      let hash = "";
-      hash = await this.getFileHash(param);
+      this.hash  = "";
+      this.hash = await this.getFileHash(param);
       this.hashProgressShow = false
 
       setTimeout(() => { // 成功获取hash值后
@@ -372,21 +373,21 @@ export default {
       if (param.file.size <= 52428800) { // 50mb 以下 普通上传;以上 分片上传
         this.uploadSliceFlag = false // 不显示分片二字
         this.uploadProgressShow = true // 显示进度条
-        this.uploadObj(param, hash, uploadProgressEvent)// 普通上传
+        this.uploadObj(param, this.hash, uploadProgressEvent)// 普通上传
       } else {
         // 判断sessionStorage中有没有hash对应的token
-        var sessionToken = sessionStorage.getItem(hash);
+        var sessionToken = sessionStorage.getItem(this.hash);
         if (sessionToken === null) { // 如果sessionStorage中没有token
           this.$message.info("文件大小超过50MB，将分片上传，请稍候")
           // 发送分片上传请求
           var bucket = encodeURI(sessionStorage.getItem("bucketName"))
-          this.$request.getSliceUploadToken(param.file.name, hash, param.file.size, bucket).then(val => {
+          this.$request.getSliceUploadToken(param.file.name, this.hash, param.file.size, bucket).then(val => {
             if (val.status === 201) {  // 201表示token创建成功
               var token = val.headers.location // 保存token
               // 文件切片上传
               this.uploadSliceFlag = true // 显示分片二字
               this.uploadProgressShow = true // 显示进度条
-              this.uploadSlice(param, token, hash)
+              this.uploadSlice(param, token)
             } else if (val.status === 200) { // 200表示hash已存在，直接显示已上传，新增版本
               this.uploadSliceFlag = true // 显示分片二字
               this.uploadProgressShow = true // 显示进度条
@@ -404,7 +405,7 @@ export default {
           })
         } else { // 如果有，使用上传失败的token继续上传
           this.uploadProgressShow = true // 显示进度条
-          await this.uploadSlice(param, sessionToken, hash)
+          await this.uploadSlice(param, sessionToken)
         }
       }
     },
@@ -462,7 +463,7 @@ export default {
     },
 
     // 分片上传
-    async uploadSlice(param, token, hash) {
+    async uploadSlice(param, token) {
       var start = parseInt(await this.headUploadSliceProgress(token)) // 分片起点
       if (start === -1) { // -1代表查看分片起点的请求失败
         return
@@ -478,7 +479,7 @@ export default {
       // 文件分片
       var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice; // 兼容方式获取slice方法
       var chunk_file = blobSlice.call(param.file, start, end);
-      var bucket = encodeURI()
+      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
       // 发送上传请求
       this.$request.uploadSlice(token, chunk_file, range, bucket).then(val => {
         if (val.status === 200) {
@@ -489,8 +490,8 @@ export default {
             this.$message.success("上传成功")
             // 最后进度条清零，重新获取对象列表
             setTimeout(() => {
-              if (sessionStorage.getItem(hash) !== null) {
-                sessionStorage.removeItem(hash)
+              if (sessionStorage.getItem(this.hash) !== null) {
+                sessionStorage.removeItem(this.hash)
               }
               this.progressPercent = 0 // 进度条归0
               this.uploadProgressShow = false // 关闭进度条
@@ -498,11 +499,13 @@ export default {
             }, 2000);
           } else { // 不是最后一个分片，递归调用uploadSlice方法
             this.uploadSlice(param, token)
+            sessionStorage.setItem(this.hash, token)
           }
         } else {
           // 上传过程中出现错误 给出错误提示，并且保存token到sessionStorage中
+          console.log(hash)
           this.$message.error("上传错误，请重新上传")
-          sessionStorage.setItem(hash, token)
+          this.sessionStorage.setItem(this.hash, token)
         }
       })
     },
