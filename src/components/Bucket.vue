@@ -127,8 +127,36 @@
               <span class="circle" aria-hidden="true">
                 <span class="icon arrow"></span>
               </span>
-            <span class="button-text">Go</span>
+            <span class="button-text">进入桶</span>
           </button>
+          <button class="learn-more" @click="deleteButton" :disabled="bucketData.length===0"
+                  :style="(bucketData.length===0 ? 'opacity: 0.6;cursor:not-allowed;':'')">
+              <span class="circle" aria-hidden="true">
+                <span class="icon arrow"></span>
+              </span>
+            <span class="button-text">删除桶</span>
+          </button>
+        </div>
+
+        <!-- 删除模态框 -->
+        <div class="ui small basic test modal transition  ">
+          <div class="ui icon header">
+            <i class="trash alternate icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+            删除桶
+          </font></font></div>
+          <div class="content">
+            <p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">删除桶后，桶内数据将一并删除，您确认操作吗？</font></font></p>
+          </div>
+          <div class="actions">
+            <div class="ui red basic cancel inverted button">
+              <i class="remove icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+              不
+            </font></font></div>
+            <div class="ui green ok inverted button" @click="deleteBucket">
+              <i class="checkmark icon"></i><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+              是的
+            </font></font></div>
+          </div>
         </div>
 
         <el-pagination
@@ -147,6 +175,7 @@
 </template>
 
 <script>
+import $ from "jquery"
 export default {
   name: "Bucket",
   inject: ['reload'],
@@ -176,7 +205,24 @@ export default {
       sessionStorage.setItem("bucketName", this.radio)
       this.reload();
     },
+    deleteButton() {
+      $('.ui.basic.modal')
+          .modal('show')
+      ;
 
+    },
+    deleteBucket(){
+      this.$request.delBucket(encodeURI(this.radio)).then(val => {
+        if (val.status === 200) {
+          this.$message.success("删除桶成功")
+        } else {
+          this.$message.error("删除桶失败")
+        }
+      }).finally(() => {
+        this.bucketName = ""
+        this.getBucket(this.searchContent, 1)
+      })
+    },
     // 获取桶列表
     getBucket(name, index) {
       this.$request.getBucketList(index, encodeURI(name)).then(val => {
@@ -203,6 +249,10 @@ export default {
     addBucket(bucketName) {
       if (bucketName === "") {
         this.$message.error("桶名称不得为空")
+        return
+      }
+      if (bucketName.length > 5 ) {
+        this.$message.error("桶名称不能超过5个字符")
         return
       }
       var headerParam = encodeURI(bucketName)
@@ -407,7 +457,7 @@ button {
   vertical-align: middle;
   text-decoration: none;
   background: transparent;
-  padding: 0;
+  padding: 2px;
   font-size: inherit;
   font-family: inherit;
 }
