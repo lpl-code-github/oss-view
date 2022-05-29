@@ -48,6 +48,18 @@ export const addBucket = params => {
         })
         .then(res => res)
 }
+// 删除桶
+export const delBucket = params => {
+    return service
+        .request({
+            url: '/bucket/',
+            method: 'DELETE',
+            headers: {
+                'bucket': params
+            },
+        })
+        .then(res => res)
+}
 // 对象最新版本分页列表api
 export const getObjLists = (params, bucket) => {
     return service
