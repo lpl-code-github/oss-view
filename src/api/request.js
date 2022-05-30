@@ -6,14 +6,16 @@ export const getHeartbeat = params => {
         .get('/heartbeat')
         .then(res => res.data)
 }
+
 // 获取节点的系统信息api
 export const getNodeSystemInfo = (params) => {
     return service
         .get('/nodeSystemInfo/' + params)
         .then(res => res)
 }
+
 // 获取桶列表
-export const getBucketList = (params,bucket) => {
+export const getBucketList = (params, bucket) => {
     return service
         .request({
             url: '/bucket/' + params,
@@ -24,6 +26,7 @@ export const getBucketList = (params,bucket) => {
         })
         .then(res => res)
 }
+
 // head查询桶是否存在
 export const searchBucket = params => {
     return service
@@ -36,6 +39,7 @@ export const searchBucket = params => {
         })
         .then(res => res)
 }
+
 // 新增桶
 export const addBucket = params => {
     return service
@@ -48,6 +52,7 @@ export const addBucket = params => {
         })
         .then(res => res)
 }
+
 // 删除桶
 export const delBucket = params => {
     return service
@@ -60,55 +65,47 @@ export const delBucket = params => {
         })
         .then(res => res)
 }
+
 // 对象最新版本分页列表api
 export const getObjLists = (params, bucket) => {
     return service
         .request({
-            url: '/allVersions/' + params,
-            method: 'GET',
-            headers: {
-                'bucket': bucket
-            },
+            url: '/allVersions/' + bucket + "/" + params,
+            method: 'GET'
         })
         .then(res => res)
-
 }
 
 // 单个对象其它版本列表api
 export const getObjOtherLists = (params, bucket) => {
     return service
         .request({
-            url: '/versions/' + params,
-            method: 'GET',
-            headers: {
-                'bucket': bucket
-            },
+            url: '/versions/' + bucket + "/" + params,
+            method: 'GET'
         })
         .then(res => res)
 }
+
 // 下载对象api
 export const getObj = (params, bucket) => {
     return service
         .request({
-            url: '/objects/' + params,
+            url: '/objects/' + bucket + "/" + params,
             method: 'GET',
-            responseType: 'blob',
-            headers: {
-                'bucket': bucket
-            },
+            responseType: 'blob'
         })
         .then(res => res)
 }
+
 // 普通上传api
 export const uploadObj = (params, data, hash, bucket, onUploadProgress) => {
     return service
         .request({
-            url: '/objects/' + params,
+            url: '/objects/' + bucket + "/" + params,
             method: 'PUT',
             data: data,
             headers: {
-                'Digest': 'SHA-256=' + hash,
-                'bucket': bucket
+                'Digest': 'SHA-256=' + hash
             },
             onUploadProgress
         })
@@ -116,19 +113,19 @@ export const uploadObj = (params, data, hash, bucket, onUploadProgress) => {
 }
 
 // 分片请求 获取token api
-export const getSliceUploadToken = (params, hash, size,bucket) => {
+export const getSliceUploadToken = (params, hash, size, bucket) => {
     return service
         .request({
-            url: '/objects/' + params,
+            url: '/objects/' + bucket + "/" + params,
             method: 'POST',
             headers: {
                 'Digest': 'SHA-256=' + hash,
-                'Size': size,
-                'bucket': bucket
+                'Size': size
             }
         })
         .then(res => res)
 }
+
 // 获取上传进度api
 export const headUploadSliceProgress = (params) => {
     return service
@@ -137,30 +134,25 @@ export const headUploadSliceProgress = (params) => {
 }
 
 // 分片上传对象api
-export const uploadSlice = (params, data, range,bucket) => {
+export const uploadSlice = (params, data, range, ) => {
     return service
         .request({
             url: params,
             method: 'put',
             data: data,
             headers: {
-                'range': range,
-                'bucket':bucket
+                'range': range
             }
         })
         .then(res => res)
 }
 
-
 // 删除对象api
-export const deleteObj = (params,bucket) => {
+export const deleteObj = (params, bucket) => {
     return service
         .request({
-            url: '/objects/' + params,
-            method: 'delete',
-            headers: {
-                'bucket':bucket
-            }
+            url: '/objects/' + bucket + "/" + params,
+            method: 'delete'
         })
         .then(res => res)
 }
@@ -194,10 +186,10 @@ export const deleteOldMetadata = (params) => {
 }
 
 // 全部日志
-export const getLog = (params,data) => {
+export const getLog = (params, data) => {
     return service
         .request({
-            url: "/getLog/"+params,
+            url: "/getLog/" + params,
             method: 'post',
             data: data
         })
