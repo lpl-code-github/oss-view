@@ -479,9 +479,8 @@ export default {
       // 文件分片
       var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice; // 兼容方式获取slice方法
       var chunk_file = blobSlice.call(param.file, start, end);
-      var bucket = encodeURI(sessionStorage.getItem("bucketName"))
       // 发送上传请求
-      this.$request.uploadSlice(token, chunk_file, range, bucket).then(val => {
+      this.$request.uploadSlice(token, chunk_file, range).then(val => {
         if (val.status === 200) {
           this.progressPercent = Math.floor((100 / param.file.size) * start)
           if (lastSlice) { // 最后一个分片上传成功
