@@ -49,7 +49,7 @@
     <!-- 系统维护按钮 -->
     <div>
       <div class="ui four statistics" style="width: auto">
-        <div class="statistic" style="margin-top: 140px">
+        <div class="statistic" style="margin-top: 100px">
           <h2 class="ui small center aligned icon header text">
             <i class="blue settings icon"></i><font style="vertical-align: inherit;"><font
               style="vertical-align: inherit;">
@@ -107,16 +107,16 @@
                     style="vertical-align: inherit;">选择对象保留版本数量</font></font></a>
                 <div class="meta text">
                   <span class="cinema"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这个操作将所有对象从最新版本起，保留n个版本的元数据</font></font></span>
-                </div>
-                <div class="description">
-                  <p></p>
-                </div>
-                <div class="extra">
+<!--                </div>-->
+<!--                <div class="description">-->
+<!--                  <p></p>-->
+<!--                </div>-->
+<!--                <div class="extra">-->
                   <el-popconfirm
                       @confirm="deleteOldMetadata"
                       cancel-button-text="再考虑一下"
                       title="您是否已经知晓该操作带来的影响并执行？">
-                    <div class="ui right floated primary  button" slot="reference"><font
+                    <div class="ui right floated primary button" style="margin-left: 100px;margin-top: -20px" slot="reference"><font
                         style="vertical-align: inherit;"><font
                         style="vertical-align: inherit;">
                       保留版本
@@ -137,16 +137,16 @@
                   <div class="meta">
                     <span class="cinema text"><font style="vertical-align: inherit;"><font
                         style="vertical-align: inherit;">这个操作将无元数据引用的对象文件移动至垃圾目录，受上个操作的影响</font></font></span>
-                  </div>
-                  <div class="description">
-                    <p></p>
-                  </div>
-                  <div class="extra">
+<!--                  </div>-->
+<!--                  <div class="description">-->
+<!--                    <p></p>-->
+<!--                  </div>-->
+<!--                  <div class="extra">-->
                     <el-popconfirm
                         @confirm="deleteOrphan"
                         cancel-button-text="再考虑一下"
                         title="您是否已经知晓该操作带来的影响并执行？">
-                      <div class="ui right floated primary button" slot="reference"><font
+                      <div class="ui right floated primary button" style="margin-left: 100px;margin-top: -20px" slot="reference"><font
                           style="vertical-align: inherit;"><font
                           style="vertical-align: inherit;">
                         删除数据
@@ -167,16 +167,16 @@
                     <div class="meta text">
                       <span class="cinema"><font style="vertical-align: inherit;"><font
                           style="vertical-align: inherit;">这个操作将全盘扫描，对可修复的对象文件进行修复操作</font></font></span>
-                    </div>
-                    <div class="description">
-                      <p></p>
-                    </div>
-                    <div class="extra">
+<!--                    </div>-->
+<!--                    <div class="description">-->
+
+<!--                    </div>-->
+<!--                    <div class="extra">-->
                       <el-popconfirm
                           @confirm="objectScanner"
                           cancel-button-text="再考虑一下"
                           title="您是否已经知晓该操作带来的影响并执行？">
-                        <div class="ui right floated primary button" slot="reference"><font
+                        <div class="ui right floated primary button" style="margin-left: 100px;margin-top: -20px" slot="reference"><font
                             style="vertical-align: inherit;"><font
                             style="vertical-align: inherit;">
                           全盘修复
