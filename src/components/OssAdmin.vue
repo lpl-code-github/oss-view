@@ -144,11 +144,16 @@
 
           <td style="display: grid;place-items: center;width: 100%">
             <div class="multi-button">
+              <button @click="copyPath(index, item)" :data-clipboard-text="objPath" id="express">
+                <i class=" copy icon"></i>
+                <div class="animate-normal ">复制链接</div>
+              </button>
               <button @click="handleDownload(index, item)" :disabled="(item.Size === '0B'? true:false)"
                       :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
                 <i class=" download icon"></i>
                 <div class="animate-normal ">下载最新版本</div>
               </button>
+
               <button @click="handAll(index, item)">
                 <i class=" server icon"></i>
                 <div class="animate-normal ">查看历史版本</div>
@@ -292,7 +297,8 @@ export default {
       // bytesPerPiece: 32000, // 约定每个切片的长度
       hashProgressPercent: 0,//计算hash进度
       notification: null,// 计算hash消息通知默认不关闭
-      hash:""// hash值
+      hash: "",// hash值
+      objPath:""// 对象url地址
     }
   },
   // beforeDestroy() {// 实例销毁之前调用
@@ -355,7 +361,7 @@ export default {
       }
 
       // 获取对象hash值的base64编码值
-      this.hash  = "";
+      this.hash = "";
       this.hash = await this.getFileHash(param);
       this.hashProgressShow = false
 
@@ -567,7 +573,19 @@ export default {
         this.drawer = true
       })
     },
-
+    // 复制对象链接
+    copyPath(index, row) {
+      this.objPath = "http://lploss.cn/apis/objects/" + sessionStorage.getItem("bucketName") + "/"+ row.Name
+      let clipboard = new this.clipboard("#express");
+      let that = this
+      clipboard.on('success', function () {
+        that.$message.success('复制成功');
+        clipboard.destroy();
+      });
+      clipboard.on('error', function () {
+        that.$message.error('复制失败');
+      });
+    },
     // 删除对象
     handleDelete(index, row) {
       // 再次提示
@@ -859,10 +877,12 @@ export default {
 .el-drawer__body {
   background-color: #2c2c2c;
 }
-.ui.table thead tr:first-child>th:first-child {
+
+.ui.table thead tr:first-child > th:first-child {
   border-radius: 0;
 }
-.ui.table thead tr:first-child>th:last-child {
+
+.ui.table thead tr:first-child > th:last-child {
   border-radius: 0;
 }
 </style>
