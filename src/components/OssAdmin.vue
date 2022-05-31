@@ -144,7 +144,8 @@
 
           <td style="display: grid;place-items: center;width: 100%">
             <div class="multi-button">
-              <button @click="copyPath(index, item)" :data-clipboard-text="objPath" id="express">
+              <button @click="copyPath(index, item)" :data-clipboard-text="objPath" id="last" :disabled="(item.Size === '0B'? true:false)"
+                      :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')">
                 <i class=" copy icon"></i>
                 <div class="animate-normal ">复制链接</div>
               </button>
@@ -199,13 +200,13 @@
         <table class="ui five column selectable inverted table">
           <thead>
           <tr>
-            <th class="two wide"><font style="vertical-align: inherit;"><font
+            <th class="three wide"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">版本号</font></font>
             </th>
-            <th class="two wide"><font style="vertical-align: inherit;"><font
+            <th class="one wide"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">大小</font></font>
             </th>
-            <th class="five wide"><font style="vertical-align: inherit;"><font
+            <th class="one wide"><font style="vertical-align: inherit;"><font
                 style="vertical-align: inherit;">对象散列值</font></font>
             </th>
             <th class="two wide" style="text-align: center"><font style="vertical-align: inherit;"><font
@@ -222,7 +223,6 @@
           </tr>
 
           <tr v-for="(item,index) in othersVersion" :key="index">
-
             <td class="single line">
               {{ item.Version }}
               <div style="display:inline-block;margin-left: 5px" v-if="item.Size === '0B'">
@@ -241,24 +241,44 @@
             </td>
 
             <td>
-          <span
-              style="max-width: 400px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
+              <span style="max-width: 300px;word-break:normal;width:auto;display:block;white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;">{{(item.Size !== '0B' ? item.Hash : '/') }}</span>
             </td>
 
-            <td style="display: grid;place-items: center;width: 100%">
-              <el-button :disabled="(item.Size === '0B'? true:false)"
-                         :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
-                         class="button el-buttons"
-                         size="mini"
-                         @click="handleDownloadOther(index, item)"
-              >
-                <button class="ui mini teal button" :disabled="(item.Size === '0B'? true:false)"
-                        :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
-                        style="margin: 0"><font style="vertical-align: inherit;"><font
-                    style="vertical-align: inherit;">
-                  <i class="download icon"></i>下载
-                </font></font></button>
-              </el-button>
+            <td >
+              <font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+                <div style="display: flex;justify-content: center;width: 100%">
+                  <el-button :disabled="(item.Size === '0B'? true:false)"
+                             :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
+                             class="button el-buttons"
+                             size="mini"
+                             @click="copyOtherPath(index, item)"
+                             :data-clipboard-text="objPath"
+                             id="other"
+                  >
+                    <button class="ui mini blue button" :disabled="(item.Size === '0B'? true:false)"
+                            :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
+                            style="margin: 0"><font style="vertical-align: inherit;"><font
+                        style="vertical-align: inherit;">
+                      <i class="copy icon"></i>链接
+                    </font></font></button>
+                  </el-button>
+                  <el-button :disabled="(item.Size === '0B'? true:false)"
+                             :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
+                             class="button el-buttons"
+                             size="mini"
+                             @click="handleDownloadOther(index, item)"
+                  >
+                    <button class="ui mini teal button" :disabled="(item.Size === '0B'? true:false)"
+                            :style="(item.Size === '0B'? 'opacity: 0.6;cursor:not-allowed;':'')"
+                            style="margin: 0"><font style="vertical-align: inherit;"><font
+                        style="vertical-align: inherit;">
+                      <i class="download icon"></i>下载
+                    </font></font></button>
+                  </el-button>
+                </div>
+
+            </font></font>
+
             </td>
           </tr>
           </tbody>
@@ -576,8 +596,21 @@ export default {
     // 复制对象链接
     copyPath(index, row) {
       this.objPath = "http://lploss.cn/apis/objects/" + sessionStorage.getItem("bucketName") + "/"+ row.Name
-      let clipboard = new this.clipboard("#express");
-      let that = this
+      let clipboard = new this.clipboard("#last");
+      let that =this
+      clipboard.on('success', function () {
+        that.$message.success('复制成功');
+        clipboard.destroy();
+      });
+      clipboard.on('error', function () {
+        that.$message.error('复制失败');
+      });
+    },
+    // 复制指定版本对象链接
+    copyOtherPath(index, row) {
+      this.objPath = "http://lploss.cn/apis/objects/" + sessionStorage.getItem("bucketName") + "/"+ row.Name+"?version="+row.Version
+      var clipboard = new this.clipboard("#other");
+      let that =this
       clipboard.on('success', function () {
         that.$message.success('复制成功');
         clipboard.destroy();
