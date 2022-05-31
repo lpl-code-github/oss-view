@@ -18,6 +18,8 @@ import './assets/css/common.css'
 import { request } from '@/api/index'
 // 引入vue事件总线bus
 import bus from '@/utils/bus'
+//main.js中全局引入
+import clipboard from 'clipboard';
 
 // 按需引入echarts
 import * as echarts from 'echarts/core';
@@ -43,6 +45,7 @@ Vue.prototype.$cookies = cookies;
 Vue.prototype.$request = request
 Vue.prototype.$bus = bus
 Vue.prototype.$echarts = echarts
+Vue.prototype.clipboard = clipboard
 // Vue.use(),安装element-ui和semantic-ui
 Vue.use(ElementUI)
 Vue.use(SuiVue)
