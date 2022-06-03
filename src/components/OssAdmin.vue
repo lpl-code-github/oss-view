@@ -492,6 +492,8 @@ export default {
     async uploadSlice(param, token) {
       var start = parseInt(await this.headUploadSliceProgress(token)) // 分片起点
       if (start === -1) { // -1代表查看分片起点的请求失败
+        this.progressPercent = 0 // 进度条归0
+        this.uploadProgressShow = false // 关闭进度条
         return
       }
       var lastSlice = (param.file.size - start) <= this.bytesPerPiece // 最后一个分片标记
@@ -527,10 +529,11 @@ export default {
             sessionStorage.setItem(this.hash, token)
           }
         } else {
-          // 上传过程中出现错误 给出错误提示，并且保存token到sessionStorage中
-          console.log(hash)
+          // 上传过程中出现错误 给出错误提示
           this.$message.error("上传错误，请重新上传")
-          this.sessionStorage.setItem(this.hash, token)
+          console.log(this.hash)
+          this.progressPercent = 0 // 进度条归0
+          this.uploadProgressShow = false // 关闭进度条
         }
       })
     },
@@ -541,8 +544,12 @@ export default {
       await this.$request.headUploadSliceProgress(token).then(val => {
         if (val.status === 200) {
           start = val.headers['content-length']// 长度
+        }else if (val.status === 404){
+          this.$message.error("token已经失效，请重新上传")
+          sessionStorage.removeItem(this.hash)
         } else {
           this.$message.error("检查进度失败")
+          sessionStorage.removeItem(this.hash)
           start = -1
         }
       })
